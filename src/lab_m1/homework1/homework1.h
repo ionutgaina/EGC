@@ -5,11 +5,11 @@
 
 namespace m1
 {
-    class Lab3 : public gfxc::SimpleScene
+    class Homework1 : public gfxc::SimpleScene
     {
      public:
-        Lab3();
-        ~Lab3();
+        Homework1();
+        ~Homework1();
 
         void Init() override;
 
@@ -34,7 +34,7 @@ namespace m1
         float scaleX, scaleY;
         float angularStep;
 
-        // TODO(student): If you need any other class variables, define them here.
-
+        bool dummy;
+        float rotation = 0;
     };
 }   // namespace m1

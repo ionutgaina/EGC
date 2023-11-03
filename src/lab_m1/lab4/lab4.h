@@ -39,11 +39,14 @@ namespace m1
         void OnWindowResize(int width, int height) override;
 
         void RenderScene();
+
+        void RenderScene2();
      protected:
         glm::mat4 modelMatrix;
         float translateX, translateY, translateZ;
         float scaleX, scaleY, scaleZ;
         float angularStepOX, angularStepOY, angularStepOZ;
+        float newAngular;
         GLenum polygonMode;
         ViewportArea miniViewportArea;
     };

@@ -49,6 +49,8 @@ void Lab4::Init()
     angularStepOY = 0;
     angularStepOZ = 0;
 
+    newAngular = 0;
+
     // Sets the resolution of the small viewport
     glm::ivec2 resolution = window->GetResolution();
     miniViewportArea = ViewportArea(50, 50, resolution.x / 5.f, resolution.y / 5.f);
@@ -72,7 +74,34 @@ void Lab4::RenderScene() {
     modelMatrix *= transform3D::Scale(scaleX, scaleY, scaleZ);
     RenderMesh(meshes["box"], shaders["Simple"], modelMatrix);
 
+
     modelMatrix = glm::mat4(1);
+
+    modelMatrix *= transform3D::Translate(0.0f, 0.5f, -1.5f);
+    modelMatrix *= transform3D::RotateOY(newAngular);
+    modelMatrix *= transform3D::Translate(0.0f, -0.5f, 1.5f);
+
+    modelMatrix *= transform3D::Translate(2.5f, 0.5f, -1.5f);
+    modelMatrix *= transform3D::RotateOX(angularStepOX);
+    modelMatrix *= transform3D::RotateOY(angularStepOY);
+    modelMatrix *= transform3D::RotateOZ(angularStepOZ);
+    RenderMesh(meshes["box"], shaders["VertexNormal"], modelMatrix);
+}
+
+void Lab4::RenderScene2() {
+    modelMatrix = glm::mat4(1);
+    modelMatrix *= transform3D::Translate(-2.5f, 0.5f, -1.5f);
+    modelMatrix *= transform3D::Translate(translateX, translateY, translateZ);
+    RenderMesh(meshes["box"], shaders["VertexNormal"], modelMatrix);
+
+    modelMatrix = glm::mat4(1);
+    modelMatrix *= transform3D::Translate(0.0f, 0.5f, -1.5f);
+    modelMatrix *= transform3D::Scale(scaleX, scaleY, scaleZ);
+    RenderMesh(meshes["box"], shaders["Simple"], modelMatrix);
+
+
+    modelMatrix = glm::mat4(1);
+
     modelMatrix *= transform3D::Translate(2.5f, 0.5f, -1.5f);
     modelMatrix *= transform3D::RotateOX(angularStepOX);
     modelMatrix *= transform3D::RotateOY(angularStepOY);
@@ -97,13 +126,13 @@ void Lab4::Update(float deltaTimeSeconds)
     glViewport(miniViewportArea.x, miniViewportArea.y, miniViewportArea.width, miniViewportArea.height);
 
     // TODO(student): render the scene again, in the new viewport
+    RenderScene2();
     DrawCoordinateSystem();
 }
 
 void Lab4::FrameEnd()
 {
 }
-
 
 /*
  *  These are callback functions. To find more about callbacks and
@@ -114,6 +143,77 @@ void Lab4::FrameEnd()
 void Lab4::OnInputUpdate(float deltaTime, int mods)
 {
     // TODO(student): Add transformation logic
+    // fisrt cube
+    if (window->KeyHold(GLFW_KEY_W)) {
+        translateZ -= deltaTime;
+    }
+    if (window->KeyHold(GLFW_KEY_S)) {
+        translateZ += deltaTime;
+    }
+    if (window->KeyHold(GLFW_KEY_A)) {
+        translateX -= deltaTime;
+    }
+    if (window->KeyHold(GLFW_KEY_D)) {
+        translateX += deltaTime;
+    }
+
+    if (window->KeyHold(GLFW_KEY_R)) {
+        translateY += deltaTime;
+    }
+
+    if (window->KeyHold(GLFW_KEY_F)) {
+        translateY -= deltaTime;
+    }
+
+    // second cube
+
+    if (window->KeyHold(GLFW_KEY_2)) {
+        scaleZ -= deltaTime;
+        scaleX -= deltaTime;
+        scaleY -= deltaTime;
+    }
+
+    if (window->KeyHold(GLFW_KEY_1)) {
+        scaleZ += deltaTime;
+        scaleX += deltaTime;
+        scaleY += deltaTime;
+    }
+
+    // third cube
+    // cu tastele 3, 4, 5, 6, 7, 8 să se rotească al treilea cub față de axele locale OX, OY, OZ
+
+    if (window->KeyHold(GLFW_KEY_3)) {
+        angularStepOX += deltaTime;
+    }
+
+    if (window->KeyHold(GLFW_KEY_4)) {
+        angularStepOX -= deltaTime;
+    }
+
+    if (window->KeyHold(GLFW_KEY_5)) {
+        angularStepOY += deltaTime;
+    }
+
+    if (window->KeyHold(GLFW_KEY_6)) {
+        angularStepOY -= deltaTime;
+    }
+
+    if (window->KeyHold(GLFW_KEY_7)) {
+        angularStepOZ += deltaTime;
+    }
+
+    if (window->KeyHold(GLFW_KEY_8)) {
+        angularStepOZ -= deltaTime;
+    }
+
+    if (window->KeyHold(GLFW_KEY_9)) {
+        newAngular += deltaTime;
+    }
+
+    if (window->KeyHold(GLFW_KEY_0)) {
+        newAngular  -= deltaTime;
+    }
+    
 
 }
 
@@ -138,6 +238,34 @@ void Lab4::OnKeyPress(int key, int mods)
     }
     
     // TODO(student): Add viewport movement and scaling logic
+    if (key == GLFW_KEY_I) {
+        miniViewportArea.y += 10;
+    }
+
+    if (key == GLFW_KEY_J) {
+        miniViewportArea.x -= 10;
+    }
+
+    if (key == GLFW_KEY_K) {
+        miniViewportArea.y -= 10;
+    }
+
+    if (key == GLFW_KEY_L) {
+        miniViewportArea.x += 10;
+    }
+
+    if (key == GLFW_KEY_U) {
+        miniViewportArea.width -= 10;
+        miniViewportArea.height -= 10;
+    }
+
+    if (key == GLFW_KEY_O) {
+        miniViewportArea.width += 10;
+        miniViewportArea.height += 10;
+    }
+
+
+
 }
 
 
