@@ -5,6 +5,8 @@
 #include "lab_m1/homework1/object2D.h"
 #include "components/simple_scene.h"
 #include "lab_m1/homework1/enemy.cpp"
+#include "lab_m1/homework1/turret.cpp"
+#include "lab_m1/homework1/bullet.cpp"
 
 namespace m1
 {
@@ -55,6 +57,8 @@ namespace m1
 
       glm::ivec2 resolution;
 
-      std::string turretPlaced[SQUARE_GRID_SIZE][SQUARE_GRID_SIZE] = {{"", "", ""}, {"", "", ""}, {"", "", ""}};
+      Turret turretPlaced[SQUARE_GRID_SIZE][SQUARE_GRID_SIZE];
+      Bullet bullet[100];
+      int bulletCount = 0;
    };
 } // namespace m1

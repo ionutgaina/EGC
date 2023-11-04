@@ -75,6 +75,18 @@ void Homework1::Init()
     Mesh *star = object2D::CreateStar("star", glm::vec3(0, 0, 0), STAR_SIZE, glm::vec3(0.5f, 0.5f, 0.5f));
     AddMeshToList(star);
 
+    star = object2D::CreateStar("yellow_star", glm::vec3(0, 0, 1), STAR_SIZE, glm::vec3(1, 1, 0));
+    AddMeshToList(star);
+
+    star = object2D::CreateStar("orange_star", glm::vec3(0, 0, 1), STAR_SIZE, glm::vec3(1.0f, 0.5f, 0));
+    AddMeshToList(star);
+
+    star = object2D::CreateStar("blue_star", glm::vec3(0, 0, 1), STAR_SIZE, glm::vec3(0, 0, 1));
+    AddMeshToList(star);
+
+    star = object2D::CreateStar("purple_star", glm::vec3(0, 0, 1), STAR_SIZE, glm::vec3(0.5f, 0, 1));
+    AddMeshToList(star);
+
     // start hexagon
     Mesh *hex;
 
@@ -126,12 +138,38 @@ void Homework1::Update(float deltaTimeSeconds)
                 modelMatrix *= transform2D::Translate((SQUARE_SIZE + SQUARE_GRID_SPACE) * j - 30, (SQUARE_SIZE + SQUARE_GRID_SPACE) * i + SQUARE_GRID_SPACE);
                 RenderMesh2D(meshes["green_square"], shaders["VertexColor"], modelMatrix);
 
-                if (turretPlaced[i][j-1] != "")
+                if (turretPlaced[i][j - 1].type != "")
                 {
                     modelMatrix = glm::mat3(1);
                     modelMatrix *= transform2D::Translate((SQUARE_SIZE + SQUARE_GRID_SPACE) * j - 30 + cx, (SQUARE_SIZE + SQUARE_GRID_SPACE) * i + SQUARE_GRID_SPACE + cy);
-                    RenderMesh2D(meshes[turretPlaced[i][j - 1]], shaders["VertexColor"], modelMatrix);
+                    RenderMesh2D(meshes[turretPlaced[i][j - 1].type], shaders["VertexColor"], modelMatrix);
+                    if (turretPlaced[i][j - 1].isShootReady(deltaTimeSeconds))
+                    {
+                        cout << "shoot\n";
+                        if (bulletCount > 100)
+                        {
+                            bulletCount = 0;
+                        }
+                        bullet[bulletCount++] = Bullet((SQUARE_SIZE + SQUARE_GRID_SPACE) * j - 30 + cx, (SQUARE_SIZE + SQUARE_GRID_SPACE) * i + SQUARE_GRID_SPACE + cy, turretPlaced[i][j - 1].type);
+                    }
                 }
+            }
+        }
+
+        { // Bulets
+
+            for (int i = 0; i < 100; i++)
+            {
+                if (bullet[i].isBulletDead(resolution.x, deltaTimeSeconds))
+                {
+                    continue;
+                }
+
+                modelMatrix = glm::mat3(1);
+                modelMatrix *= transform2D::Translate(bullet[i].x, bullet[i].y);
+                modelMatrix *= transform2D::Scale(1.5f, 1.5f);
+                modelMatrix *= transform2D::Rotate(angularStep);
+                RenderMesh2D(meshes[bullet[i].getBulletType()], shaders["VertexColor"], modelMatrix);
             }
         }
 
@@ -207,6 +245,7 @@ void Homework1::Update(float deltaTimeSeconds)
     // TODO lose if life <= 0
 
     timePassed += std::floor(deltaTimeSeconds * 100);
+    angularStep += deltaTimeSeconds * 2;
 }
 
 void Homework1::FrameEnd()
@@ -273,14 +312,13 @@ void Homework1::OnMouseBtnRelease(int mouseX, int mouseY, int button, int mods)
         {
             for (int j = 1; j <= SQUARE_GRID_SIZE; j++)
             {
-                // modelMatrix *= transform2D::Translate((SQUARE_SIZE + SQUARE_GRID_SPACE) * j - 30, (SQUARE_SIZE + SQUARE_GRID_SPACE) * i + SQUARE_GRID_SPACE);
                 if (mouseX >= (SQUARE_SIZE + SQUARE_GRID_SPACE) * j - 30 && (SQUARE_SIZE + SQUARE_GRID_SPACE) * j - 30 + SQUARE_SIZE >= mouseX)
                 {
                     if (mouseY >= resolution.y - (SQUARE_SIZE + SQUARE_GRID_SPACE) * i && resolution.y - (SQUARE_SIZE + SQUARE_GRID_SPACE) * i + SQUARE_SIZE >= mouseY)
                     {
-                        if (turretSelectedIndex != -1 && turretPlaced[i - 1][j - 1] == "")
+                        if (turretSelectedIndex != -1 && turretPlaced[i - 1][j - 1].type == "")
                         {
-                            turretPlaced[i - 1][j - 1] = turretNames[turretSelectedIndex];
+                            turretPlaced[i - 1][j - 1].type = turretNames[turretSelectedIndex];
                             currency -= turretPrices[turretSelectedIndex];
                             turretSelected = false;
                             turretSelectedIndex = -1;
