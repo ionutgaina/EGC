@@ -41,8 +41,6 @@ void Homework1::Init()
     scaleX = 1;
     scaleY = 1;
 
-    
-
     // Initialize angularStep
     angularStep = 0;
 
@@ -127,6 +125,13 @@ void Homework1::Update(float deltaTimeSeconds)
                 modelMatrix = glm::mat3(1);
                 modelMatrix *= transform2D::Translate((SQUARE_SIZE + SQUARE_GRID_SPACE) * j - 30, (SQUARE_SIZE + SQUARE_GRID_SPACE) * i + SQUARE_GRID_SPACE);
                 RenderMesh2D(meshes["green_square"], shaders["VertexColor"], modelMatrix);
+
+                if (turretPlaced[i][j-1] != "")
+                {
+                    modelMatrix = glm::mat3(1);
+                    modelMatrix *= transform2D::Translate((SQUARE_SIZE + SQUARE_GRID_SPACE) * j - 30 + cx, (SQUARE_SIZE + SQUARE_GRID_SPACE) * i + SQUARE_GRID_SPACE + cy);
+                    RenderMesh2D(meshes[turretPlaced[i][j - 1]], shaders["VertexColor"], modelMatrix);
+                }
             }
         }
 
@@ -194,7 +199,7 @@ void Homework1::Update(float deltaTimeSeconds)
         {
             modelMatrix = glm::mat3(1);
             modelMatrix *= transform2D::Translate(turretX, resolution.y - turretY);
-            RenderMesh2D(meshes[turretNames[turretSelectedIndex - 1]], shaders["VertexColor"], modelMatrix);
+            RenderMesh2D(meshes[turretNames[turretSelectedIndex]], shaders["VertexColor"], modelMatrix);
         }
     }
 
@@ -247,12 +252,13 @@ void Homework1::OnMouseBtnPress(int mouseX, int mouseY, int button, int mods)
             {
                 if (mouseY <= (SQUARE_SIZE + SQUARE_GRID_SPACE) + SQUARE_GRID_SPACE && mouseY >= SQUARE_GRID_SPACE)
                 {
-                    if (turretSelectedIndex == -1)
+                    if (turretSelectedIndex == -1 && currency >= turretPrices[i - 1])
                     {
-                        turretSelectedIndex = i;
+                        turretX = mouseX;
+                        turretY = mouseY;
+                        turretSelectedIndex = i - 1;
                         turretSelected = true;
                     }
-                    printf("turret %d selected\n", turretSelectedIndex);
                 }
             }
         }
@@ -263,10 +269,27 @@ void Homework1::OnMouseBtnRelease(int mouseX, int mouseY, int button, int mods)
 {
     if (IS_BIT_SET(button, GLFW_MOUSE_BUTTON_LEFT))
     {
+        for (int i = 1; i <= SQUARE_GRID_SIZE; i++)
+        {
+            for (int j = 1; j <= SQUARE_GRID_SIZE; j++)
+            {
+                // modelMatrix *= transform2D::Translate((SQUARE_SIZE + SQUARE_GRID_SPACE) * j - 30, (SQUARE_SIZE + SQUARE_GRID_SPACE) * i + SQUARE_GRID_SPACE);
+                if (mouseX >= (SQUARE_SIZE + SQUARE_GRID_SPACE) * j - 30 && (SQUARE_SIZE + SQUARE_GRID_SPACE) * j - 30 + SQUARE_SIZE >= mouseX)
+                {
+                    if (mouseY >= resolution.y - (SQUARE_SIZE + SQUARE_GRID_SPACE) * i && resolution.y - (SQUARE_SIZE + SQUARE_GRID_SPACE) * i + SQUARE_SIZE >= mouseY)
+                    {
+                        if (turretSelectedIndex != -1 && turretPlaced[i - 1][j - 1] == "")
+                        {
+                            turretPlaced[i - 1][j - 1] = turretNames[turretSelectedIndex];
+                            currency -= turretPrices[turretSelectedIndex];
+                            turretSelected = false;
+                            turretSelectedIndex = -1;
+                        }
+                    }
+                }
+            }
+        }
         turretSelected = false;
-        printf("turret %d deselected\n", turretSelectedIndex);
-        turretX = -1000;
-        turretY = -1000;
         turretSelectedIndex = -1;
     }
 }

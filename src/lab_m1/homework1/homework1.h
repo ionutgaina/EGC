@@ -54,5 +54,7 @@ namespace m1
       int turretY = -1000;
 
       glm::ivec2 resolution;
+
+      std::string turretPlaced[SQUARE_GRID_SIZE][SQUARE_GRID_SIZE] = {{"", "", ""}, {"", "", ""}, {"", "", ""}};
    };
 } // namespace m1
