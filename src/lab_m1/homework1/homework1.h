@@ -44,5 +44,15 @@ namespace m1
       int currency = 10;
       long timePassed = 0;
       Enemy enemy[ENEMY_SIZE];
+
+      std::string turretNames[4] = {"blue_turret", "orange_turret", "yellow_turret", "purple_turret"};
+      int turretPrices[4] = {1, 2, 2, 3};
+
+      bool turretSelected = false;
+      int turretSelectedIndex = -1;
+      int turretX = -1000;
+      int turretY = -1000;
+
+      glm::ivec2 resolution;
    };
 } // namespace m1

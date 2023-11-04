@@ -18,7 +18,7 @@ Homework1::~Homework1()
 
 void Homework1::Init()
 {
-    glm::ivec2 resolution = window->GetResolution();
+    resolution = window->GetResolution();
     auto camera = GetSceneCamera();
     camera->SetOrthographic(0, (float)resolution.x, 0, (float)resolution.y, 0.01f, 400);
     camera->SetPosition(glm::vec3(0, 0, 50));
@@ -41,6 +41,8 @@ void Homework1::Init()
     scaleX = 1;
     scaleY = 1;
 
+    
+
     // Initialize angularStep
     angularStep = 0;
 
@@ -56,16 +58,16 @@ void Homework1::Init()
     // start Init turrets
     int turretSize = 50;
 
-    Mesh *turret = object2D::CreateTurret("blue_turret", glm::vec3(0, 0, 0), TURRET_SIZE, glm::vec3(0, 0, 1));
+    Mesh *turret = object2D::CreateTurret("blue_turret", glm::vec3(0, 0, 9), TURRET_SIZE, glm::vec3(0, 0, 1));
     AddMeshToList(turret);
 
-    turret = object2D::CreateTurret("orange_turret", glm::vec3(0, 0, 0), TURRET_SIZE, glm::vec3(1.0f, 0.5f, 0));
+    turret = object2D::CreateTurret("orange_turret", glm::vec3(0, 0, 9), TURRET_SIZE, glm::vec3(1.0f, 0.5f, 0));
     AddMeshToList(turret);
 
-    turret = object2D::CreateTurret("yellow_turret", glm::vec3(0, 0, 0), TURRET_SIZE, glm::vec3(1, 1, 0));
+    turret = object2D::CreateTurret("yellow_turret", glm::vec3(0, 0, 9), TURRET_SIZE, glm::vec3(1, 1, 0));
     AddMeshToList(turret);
 
-    turret = object2D::CreateTurret("purple_turret", glm::vec3(0, 0, 0), TURRET_SIZE, glm::vec3(0.5f, 0, 1));
+    turret = object2D::CreateTurret("purple_turret", glm::vec3(0, 0, 9), TURRET_SIZE, glm::vec3(0.5f, 0, 1));
     AddMeshToList(turret);
 
     // end Init turrets
@@ -129,9 +131,6 @@ void Homework1::Update(float deltaTimeSeconds)
         }
 
         { // Turrets for buy menu
-            std::string turretNames[] = {"blue_turret", "orange_turret", "yellow_turret", "purple_turret"};
-            int turretPrices[] = {1, 2, 2, 3};
-
             for (int i = 1; i <= 4; i++)
             {
                 modelMatrix = glm::mat3(1);
@@ -169,7 +168,7 @@ void Homework1::Update(float deltaTimeSeconds)
         }
 
         {
-            for (int i = 0; i < ENEMY_SIZE && life > 0; i++)
+            for (int i = 0; i < ENEMY_SIZE; i++)
             {
                 if (timePassed >= enemy[i].timeAppear && enemy[i].renderEnemy(deltaTimeSeconds))
                 {
@@ -180,12 +179,22 @@ void Homework1::Update(float deltaTimeSeconds)
                     modelMatrix *= transform2D::Scale(enemy[i].scale * .75f, enemy[i].scale * .75f);
                     RenderMesh2D(meshes["inner_hex"], shaders["VertexColor"], modelMatrix);
                 }
-                
-                if (enemy[i].translateX <= 50 && !enemy[i].isDead) {
+
+                if (enemy[i].translateX <= 50 && !enemy[i].isDead)
+                {
                     life--;
                     enemy[i].isDead = true;
                 }
             }
+        }
+    }
+
+    { // drag and drop turret
+        if (turretSelected)
+        {
+            modelMatrix = glm::mat3(1);
+            modelMatrix *= transform2D::Translate(turretX, resolution.y - turretY);
+            RenderMesh2D(meshes[turretNames[turretSelectedIndex - 1]], shaders["VertexColor"], modelMatrix);
         }
     }
 
@@ -220,17 +229,46 @@ void Homework1::OnKeyRelease(int key, int mods)
 
 void Homework1::OnMouseMove(int mouseX, int mouseY, int deltaX, int deltaY)
 {
-    // Add mouse move event
+    if (turretSelected)
+    {
+        turretX = mouseX;
+        turretY = mouseY;
+    }
 }
 
 void Homework1::OnMouseBtnPress(int mouseX, int mouseY, int button, int mods)
 {
     // Add mouse button press event
+    if (IS_BIT_SET(button, GLFW_MOUSE_BUTTON_LEFT))
+    {
+        for (int i = 1; i <= 4; i++)
+        {
+            if (mouseX + cx >= ((SQUARE_SIZE + SQUARE_GRID_SPACE)) * i + SQUARE_GRID_SPACE && ((SQUARE_SIZE + SQUARE_GRID_SPACE)) * i + SQUARE_SIZE + SQUARE_GRID_SPACE >= mouseX + cx)
+            {
+                if (mouseY <= (SQUARE_SIZE + SQUARE_GRID_SPACE) + SQUARE_GRID_SPACE && mouseY >= SQUARE_GRID_SPACE)
+                {
+                    if (turretSelectedIndex == -1)
+                    {
+                        turretSelectedIndex = i;
+                        turretSelected = true;
+                    }
+                    printf("turret %d selected\n", turretSelectedIndex);
+                }
+            }
+        }
+    }
 }
 
 void Homework1::OnMouseBtnRelease(int mouseX, int mouseY, int button, int mods)
 {
-    // Add mouse button release event
+    if (IS_BIT_SET(button, GLFW_MOUSE_BUTTON_LEFT))
+    {
+        turretSelected = false;
+        printf("turret %d deselected\n", turretSelectedIndex);
+        turretX = -1000;
+        turretY = -1000;
+        turretSelectedIndex = -1;
+    }
 }
 
 void Homework1::OnMouseScroll(int mouseX, int mouseY, int offsetX, int offsetY)
