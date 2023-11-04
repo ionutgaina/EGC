@@ -36,5 +36,6 @@ namespace m1
 
         bool dummy;
         float rotation = 0;
+
     };
 }   // namespace m1

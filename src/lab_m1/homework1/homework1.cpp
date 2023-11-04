@@ -12,6 +12,8 @@ using namespace m1;
 #define SQUARE_GRID_SIZE 3
 #define SQUARE_GRID_SPACE 20
 #define SQUARE_SIZE 100
+#define TURRET_SIZE 25
+#define STAR_SIZE 25
 
 /*
  *  To find out more about `FrameStart`, `Update`, `FrameEnd`
@@ -58,9 +60,29 @@ void Homework1::Init()
     AddMeshToList(square1);
     square1 = object2D::CreateSquare("green_square", corner, squareSide, glm::vec3(0, 1, 0), true);
     AddMeshToList(square1);
+    square1 = object2D::CreateSquare("border_square", corner, squareSide, glm::vec3(1, 1, 1));
+    AddMeshToList(square1);
 
-    Mesh *turret = object2D::CreateRhomb("green_turret", glm::vec3(0, 0, 0), squareSide, glm::vec3(0, 1, 0));
+    // start Init turrets
+    int turretSize = 50;
+
+    Mesh *turret = object2D::CreateTurret("blue_turret", glm::vec3(0, 0, 0), TURRET_SIZE, glm::vec3(0, 0, 1));
     AddMeshToList(turret);
+
+    turret = object2D::CreateTurret("orange_turret", glm::vec3(0, 0, 0), TURRET_SIZE, glm::vec3(1.0f, 0.5f, 0));
+    AddMeshToList(turret);
+
+    turret = object2D::CreateTurret("yellow_turret", glm::vec3(0, 0, 0), TURRET_SIZE, glm::vec3(1, 1, 0));
+    AddMeshToList(turret);
+
+    turret = object2D::CreateTurret("purple_turret", glm::vec3(0, 0, 0), TURRET_SIZE, glm::vec3(0.5f, 0, 1));
+    AddMeshToList(turret);
+
+    // end Init turrets
+
+    // start Init stars
+    Mesh *star = object2D::CreateStar("star", glm::vec3(0, 0, 0), STAR_SIZE, glm::vec3(0.5f, 0.5f, 0.5f));
+    AddMeshToList(star);
 }
 
 void Homework1::FrameStart()
@@ -95,10 +117,28 @@ void Homework1::Update(float deltaTimeSeconds)
         }
     }
 
-    modelMatrix = glm::mat3(1);
-    modelMatrix *= transform2D::Translate(600, 600);
-    modelMatrix *= transform2D::Scale(scaleX, scaleY);
-    RenderMesh2D(meshes["green_turret"], shaders["VertexColor"], modelMatrix);
+    // Turrets for buy menu
+
+    std::string turretNames[] = {"blue_turret", "orange_turret", "yellow_turret", "purple_turret"};
+    int turretPrices[] = {1, 2, 2, 3};
+
+    for (int i = 1; i <= 4; i++)
+    {
+        modelMatrix = glm::mat3(1);
+        modelMatrix *= transform2D::Translate((SQUARE_SIZE + SQUARE_GRID_SPACE) * i + SQUARE_GRID_SPACE, 650);
+        RenderMesh2D(meshes[turretNames[i - 1]], shaders["VertexColor"], modelMatrix);
+
+        modelMatrix = glm::mat3(1);
+        modelMatrix *= transform2D::Translate(((SQUARE_SIZE + SQUARE_GRID_SPACE)) * i - cx + SQUARE_GRID_SPACE, 650 - cy);
+        RenderMesh2D(meshes["border_square"], shaders["VertexColor"], modelMatrix);
+
+        for (int j = 0; j < turretPrices[i - 1]; j++)
+        {
+            modelMatrix = glm::mat3(1);
+            modelMatrix *= transform2D::Translate((SQUARE_SIZE + SQUARE_GRID_SPACE) * i - STAR_SIZE / 2 + (j * (STAR_SIZE + 10)), 650 - SQUARE_SIZE / 2 - STAR_SIZE);
+            RenderMesh2D(meshes["star"], shaders["VertexColor"], modelMatrix);
+        }
+    }
 }
 
 void Homework1::FrameEnd()
@@ -112,15 +152,6 @@ void Homework1::FrameEnd()
 
 void Homework1::OnInputUpdate(float deltaTime, int mods)
 {
-    if (window->KeyHold(GLFW_KEY_W))
-    {
-        scaleX += deltaTime * 10;
-        scaleY += deltaTime * 10;
-    }
-    else if (window->KeyHold(GLFW_KEY_S)){
-        scaleX -= deltaTime * 10;
-        scaleY -= deltaTime * 10;
-    }
 }
 
 void Homework1::OnKeyPress(int key, int mods)

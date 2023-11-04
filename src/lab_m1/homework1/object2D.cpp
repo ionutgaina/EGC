@@ -39,13 +39,12 @@ Mesh *object2D::CreateSquare(
     return square;
 }
 
-Mesh *object2D::CreateRhomb(
+Mesh *object2D::CreateTurret(
     const std::string &name,
     glm::vec3 middlePoint,
     float length,
     glm::vec3 color)
 {
-    glm::vec3 middle = middlePoint;
 
     std::vector<VertexFormat> vertices =
         {
@@ -66,6 +65,38 @@ Mesh *object2D::CreateRhomb(
         0, 2, 3,
         4, 5, 6,
         4, 6, 7,
+    };
+
+    turret->InitFromData(vertices, indices);
+    return turret;
+}
+
+
+Mesh *object2D ::CreateStar(
+    const std::string &name,
+    glm::vec3 middlePoint,
+    float length,
+    glm::vec3 color)
+{
+
+    std::vector<VertexFormat> vertices =
+        {
+            VertexFormat(middlePoint, color), // F
+            VertexFormat(middlePoint + glm::vec3(0, length/1.47f, 0), color), // D
+            VertexFormat(middlePoint + glm::vec3(-length/1.545f, length/4.76f, 0), color), // E
+            VertexFormat(middlePoint + glm::vec3(length/1.545f, length/4.76f, 0), color), // C
+            VertexFormat(middlePoint + glm::vec3(-length/2.5f, -length/1.815, 0), color), // A
+            VertexFormat(middlePoint + glm::vec3(length/2.5f, -length/1.815, 0), color), // B
+        };
+
+    Mesh *turret = new Mesh(name);
+    std::vector<unsigned int> indices = 
+    {
+        1, 5, 0,
+        1, 0, 4,
+        2, 3, 0,
+        2, 0, 5,
+        4, 3, 0
     };
 
     turret->InitFromData(vertices, indices);
