@@ -1,19 +1,7 @@
 #include "lab_m1/homework1/homework1.h"
 
-#include <vector>
-#include <iostream>
-
-#include "lab_m1/homework1/transform2D.h"
-#include "lab_m1/homework1/object2D.h"
-
 using namespace std;
 using namespace m1;
-
-#define SQUARE_GRID_SIZE 3
-#define SQUARE_GRID_SPACE 20
-#define SQUARE_SIZE 100
-#define TURRET_SIZE 25
-#define STAR_SIZE 25
 
 /*
  *  To find out more about `FrameStart`, `Update`, `FrameEnd`
@@ -62,6 +50,8 @@ void Homework1::Init()
     AddMeshToList(square1);
     square1 = object2D::CreateSquare("border_square", corner, squareSide, glm::vec3(1, 1, 1));
     AddMeshToList(square1);
+    square1 = object2D::CreateSquare("life_square", corner, squareSide, glm::vec3(1, 0, 0), true);
+    AddMeshToList(square1);
 
     // start Init turrets
     int turretSize = 50;
@@ -81,8 +71,30 @@ void Homework1::Init()
     // end Init turrets
 
     // start Init stars
+    // grey star
     Mesh *star = object2D::CreateStar("star", glm::vec3(0, 0, 0), STAR_SIZE, glm::vec3(0.5f, 0.5f, 0.5f));
     AddMeshToList(star);
+
+    // start hexagon
+    Mesh *hex;
+
+    hex = object2D::CreateHexagon("inner_hex", glm::vec3(0, 0, 11), HEXAGON_SIZE, glm::vec3(0.5f, 1.0f, 0));
+    AddMeshToList(hex);
+    hex = object2D::CreateHexagon("blue_hex", glm::vec3(0, 0, 10), HEXAGON_SIZE, glm::vec3(0, 0, 1));
+    AddMeshToList(hex);
+    hex = object2D::CreateHexagon("orange_hex", glm::vec3(0, 0, 10), HEXAGON_SIZE, glm::vec3(1.0f, 0.5f, 0));
+    AddMeshToList(hex);
+    hex = object2D::CreateHexagon("yellow_hex", glm::vec3(0, 0, 10), HEXAGON_SIZE, glm::vec3(1, 1, 0));
+    AddMeshToList(hex);
+    hex = object2D::CreateHexagon("purple_hex", glm::vec3(0, 0, 10), HEXAGON_SIZE, glm::vec3(0.5f, 0, 1));
+    AddMeshToList(hex);
+    // end hexagon
+
+    // start Init enemies
+    for (int i = 0; i < ENEMY_SIZE; i++)
+    {
+        enemy[i] = Enemy();
+    }
 }
 
 void Homework1::FrameStart()
@@ -115,30 +127,72 @@ void Homework1::Update(float deltaTimeSeconds)
                 RenderMesh2D(meshes["green_square"], shaders["VertexColor"], modelMatrix);
             }
         }
-    }
 
-    // Turrets for buy menu
+        { // Turrets for buy menu
+            std::string turretNames[] = {"blue_turret", "orange_turret", "yellow_turret", "purple_turret"};
+            int turretPrices[] = {1, 2, 2, 3};
 
-    std::string turretNames[] = {"blue_turret", "orange_turret", "yellow_turret", "purple_turret"};
-    int turretPrices[] = {1, 2, 2, 3};
+            for (int i = 1; i <= 4; i++)
+            {
+                modelMatrix = glm::mat3(1);
+                modelMatrix *= transform2D::Translate((SQUARE_SIZE + SQUARE_GRID_SPACE) * i + SQUARE_GRID_SPACE, 650);
+                RenderMesh2D(meshes[turretNames[i - 1]], shaders["VertexColor"], modelMatrix);
 
-    for (int i = 1; i <= 4; i++)
-    {
-        modelMatrix = glm::mat3(1);
-        modelMatrix *= transform2D::Translate((SQUARE_SIZE + SQUARE_GRID_SPACE) * i + SQUARE_GRID_SPACE, 650);
-        RenderMesh2D(meshes[turretNames[i - 1]], shaders["VertexColor"], modelMatrix);
+                modelMatrix = glm::mat3(1);
+                modelMatrix *= transform2D::Translate(((SQUARE_SIZE + SQUARE_GRID_SPACE)) * i - cx + SQUARE_GRID_SPACE, 650 - cy);
+                RenderMesh2D(meshes["border_square"], shaders["VertexColor"], modelMatrix);
 
-        modelMatrix = glm::mat3(1);
-        modelMatrix *= transform2D::Translate(((SQUARE_SIZE + SQUARE_GRID_SPACE)) * i - cx + SQUARE_GRID_SPACE, 650 - cy);
-        RenderMesh2D(meshes["border_square"], shaders["VertexColor"], modelMatrix);
+                for (int j = 0; j < turretPrices[i - 1]; j++)
+                {
+                    modelMatrix = glm::mat3(1);
+                    modelMatrix *= transform2D::Translate((SQUARE_SIZE + SQUARE_GRID_SPACE) * i - STAR_SIZE / 2 + (j * (STAR_SIZE + 10)), 650 - SQUARE_SIZE / 2 - STAR_SIZE);
+                    RenderMesh2D(meshes["star"], shaders["VertexColor"], modelMatrix);
+                }
+            }
+        }
 
-        for (int j = 0; j < turretPrices[i - 1]; j++)
+        { // Life bar and currency
+            for (int i = 6; i < 6 + life; i++)
+            {
+                modelMatrix = glm::mat3(1);
+                modelMatrix *= transform2D::Translate(((SQUARE_SIZE + SQUARE_GRID_SPACE)) * i - (cx * 0.75f) + SQUARE_GRID_SPACE, 650 - (cy * 0.75f));
+                modelMatrix *= transform2D::Scale(0.75f, 0.75f);
+                RenderMesh2D(meshes["life_square"], shaders["VertexColor"], modelMatrix);
+            }
+
+            for (int i = 0; i < min(currency, 15); i++)
+            {
+                modelMatrix = glm::mat3(1);
+                modelMatrix *= transform2D::Translate((SQUARE_SIZE + SQUARE_GRID_SPACE) * 6 - STAR_SIZE / 2 + (i * (STAR_SIZE + 10)), 650 - SQUARE_SIZE / 2 - STAR_SIZE);
+                RenderMesh2D(meshes["star"], shaders["VertexColor"], modelMatrix);
+            }
+        }
+
         {
-            modelMatrix = glm::mat3(1);
-            modelMatrix *= transform2D::Translate((SQUARE_SIZE + SQUARE_GRID_SPACE) * i - STAR_SIZE / 2 + (j * (STAR_SIZE + 10)), 650 - SQUARE_SIZE / 2 - STAR_SIZE);
-            RenderMesh2D(meshes["star"], shaders["VertexColor"], modelMatrix);
+            for (int i = 0; i < ENEMY_SIZE && life > 0; i++)
+            {
+                if (timePassed >= enemy[i].timeAppear && enemy[i].renderEnemy(deltaTimeSeconds))
+                {
+                    modelMatrix = glm::mat3(1);
+                    modelMatrix *= transform2D::Translate(enemy[i].translateX, enemy[i].translateY);
+                    modelMatrix *= transform2D::Scale(enemy[i].scale, enemy[i].scale);
+                    RenderMesh2D(meshes[enemy[i].type_mesh], shaders["VertexColor"], modelMatrix);
+                    modelMatrix *= transform2D::Scale(enemy[i].scale * .75f, enemy[i].scale * .75f);
+                    RenderMesh2D(meshes["inner_hex"], shaders["VertexColor"], modelMatrix);
+                }
+                
+                if (enemy[i].translateX <= 50 && !enemy[i].isDead) {
+                    life--;
+                    enemy[i].isDead = true;
+                }
+            }
         }
     }
+
+    // TODO win if timePassed > 1000
+    // TODO lose if life <= 0
+
+    timePassed += std::floor(deltaTimeSeconds * 100);
 }
 
 void Homework1::FrameEnd()

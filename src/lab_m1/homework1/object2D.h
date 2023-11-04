@@ -14,5 +14,7 @@ namespace object2D
 
     Mesh* CreateTurret(const std::string &name, glm::vec3 middlePoint, float length, glm::vec3 color);
 
-    Mesh* CreateStar(const std::string &name, glm::vec3 leftBottomCorner, float length, glm::vec3 color);
+    Mesh* CreateStar(const std::string &name, glm::vec3 middlePoint, float length, glm::vec3 color);
+
+    Mesh* CreateHexagon(const std::string &name, glm::vec3 middlePoint, float length, glm::vec3 color);
 }

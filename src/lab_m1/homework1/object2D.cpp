@@ -48,29 +48,36 @@ Mesh *object2D::CreateTurret(
 
     std::vector<VertexFormat> vertices =
         {
-            VertexFormat(middlePoint, color), // C
-            VertexFormat(middlePoint + glm::vec3(-length/2, length, 0), color), // A
-            VertexFormat(middlePoint + glm::vec3(-length, 0, 0), color), // B
-            VertexFormat(middlePoint + glm::vec3(-length/2, -length, 0), color), // D
-            VertexFormat(middlePoint + glm::vec3(-length/2, length/3, 0), color), // I
-            VertexFormat(middlePoint + glm::vec3(-length/2, -length/3, 0), color), // H
-            VertexFormat(middlePoint + glm::vec3(length, -length/3, 0), color), // G
-            VertexFormat(middlePoint + glm::vec3(length, length/3, 0), color), // F
+            VertexFormat(middlePoint, color),                                          // C
+            VertexFormat(middlePoint + glm::vec3(-length / 2, length, 0), color),      // A
+            VertexFormat(middlePoint + glm::vec3(-length, 0, 0), color),               // B
+            VertexFormat(middlePoint + glm::vec3(-length / 2, -length, 0), color),     // D
+            VertexFormat(middlePoint + glm::vec3(-length / 2, length / 3, 0), color),  // I
+            VertexFormat(middlePoint + glm::vec3(-length / 2, -length / 3, 0), color), // H
+            VertexFormat(middlePoint + glm::vec3(length, -length / 3, 0), color),      // G
+            VertexFormat(middlePoint + glm::vec3(length, length / 3, 0), color),       // F
         };
 
     Mesh *turret = new Mesh(name);
-    std::vector<unsigned int> indices = 
-    {
-        0, 1, 2,
-        0, 2, 3,
-        4, 5, 6,
-        4, 6, 7,
-    };
+    std::vector<unsigned int> indices =
+        {
+            0,
+            1,
+            2,
+            0,
+            2,
+            3,
+            4,
+            5,
+            6,
+            4,
+            6,
+            7,
+        };
 
     turret->InitFromData(vertices, indices);
     return turret;
 }
-
 
 Mesh *object2D ::CreateStar(
     const std::string &name,
@@ -81,24 +88,48 @@ Mesh *object2D ::CreateStar(
 
     std::vector<VertexFormat> vertices =
         {
-            VertexFormat(middlePoint, color), // F
-            VertexFormat(middlePoint + glm::vec3(0, length/1.47f, 0), color), // D
-            VertexFormat(middlePoint + glm::vec3(-length/1.545f, length/4.76f, 0), color), // E
-            VertexFormat(middlePoint + glm::vec3(length/1.545f, length/4.76f, 0), color), // C
-            VertexFormat(middlePoint + glm::vec3(-length/2.5f, -length/1.815, 0), color), // A
-            VertexFormat(middlePoint + glm::vec3(length/2.5f, -length/1.815, 0), color), // B
+            VertexFormat(middlePoint, color),                                                  // F
+            VertexFormat(middlePoint + glm::vec3(0, length / 1.47f, 0), color),                // D
+            VertexFormat(middlePoint + glm::vec3(-length / 1.545f, length / 4.76f, 0), color), // E
+            VertexFormat(middlePoint + glm::vec3(length / 1.545f, length / 4.76f, 0), color),  // C
+            VertexFormat(middlePoint + glm::vec3(-length / 2.5f, -length / 1.815, 0), color),  // A
+            VertexFormat(middlePoint + glm::vec3(length / 2.5f, -length / 1.815, 0), color),   // B
         };
 
-    Mesh *turret = new Mesh(name);
-    std::vector<unsigned int> indices = 
-    {
-        1, 5, 0,
-        1, 0, 4,
-        2, 3, 0,
-        2, 0, 5,
-        4, 3, 0
-    };
+    Mesh *star = new Mesh(name);
+    std::vector<unsigned int> indices =
+        {
+            1, 5, 0,
+            1, 0, 4,
+            2, 3, 0,
+            2, 0, 5,
+            4, 3, 0};
 
-    turret->InitFromData(vertices, indices);
-    return turret;
+    star->InitFromData(vertices, indices);
+    return star;
+}
+
+Mesh *object2D ::CreateHexagon(
+    const std::string &name,
+    glm::vec3 middlePoint,
+    float length,
+    glm::vec3 color)
+{
+
+    std::vector<VertexFormat> vertices =
+        {
+            VertexFormat(middlePoint, color),                           // center
+            VertexFormat(middlePoint + glm::vec3(-length/2, length, 0), color),  // left top
+            VertexFormat(middlePoint + glm::vec3(length/2, length, 0), color),   // right top
+            VertexFormat(middlePoint + glm::vec3(length, 0, 0), color),      // right
+            VertexFormat(middlePoint + glm::vec3(length/2, -length, 0), color),  // right bottom
+            VertexFormat(middlePoint + glm::vec3(-length/2, -length, 0), color), // left bottom
+            VertexFormat(middlePoint + glm::vec3(-length, 0, 0), color),     // left
+        };
+
+    Mesh *hexagon = new Mesh(name);
+    std::vector<unsigned int> indices = {0, 1, 2, 3, 4, 5, 6, 1};
+    hexagon->SetDrawMode(GL_TRIANGLE_FAN);
+    hexagon->InitFromData(vertices, indices);
+    return hexagon;
 }
