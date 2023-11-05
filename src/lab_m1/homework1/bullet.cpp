@@ -31,27 +31,6 @@ public:
 
     std::string getBulletType()
     {
-
-        if (this->type == "blue_turret")
-        {
-            return "blue_star";
-        }
-        else if (this->type == "orange_turret")
-        {
-            return "orange_star";
-        }
-        else if (this->type == "yellow_turret")
-        {
-            return "yellow_star";
-        }
-        else if (this->type == "purple_turret")
-        {
-            return "purple_star";
-        }
-        else
-        {
-            std::cout << "Error: Invalid turret type " << this->type << endl;
-            return "";
-        }
+        return this->type;
     }
 };

@@ -6,7 +6,9 @@ public:
     std::string type = "";
     float cooldown = 0;
     bool isDead = false;
+    float scale = 1;
     float radius = TURRET_SIZE / 0.95f;
+    bool readyForShot = true;
     int x;
     int y;
 
@@ -17,26 +19,49 @@ public:
         this->type = type;
     }
 
-    bool isShootReady(float deltaTimeSeconds)
+    void isShootReady(float deltaTimeSeconds)
     {
         if (cooldown <= 0)
         {
+            if (this->isDead)
+            {
+                readyForShot = false;
+            }
+
             cooldown = TURRET_COOLDOWN;
-            return true;
+            readyForShot = true;
         }
         else
         {
             cooldown -= deltaTimeSeconds * 10;
-            return false;
+            readyForShot = false;
         }
     }
 
-    void resetTurret() {
-        this->type = "";
+    bool isDeadTurret(float deltaTimeSeconds)
+    {
+        if (this->scale <= 0)
+        {
+            this->resetTurret();
+            return true;
+        }
+
+        if (this->isDead)
+        {
+            this->scale -= deltaTimeSeconds * 5;
+            return true;
+        }
+        return false;
+    }
+
+    void resetTurret()
+    {
         this->cooldown = 0;
         this->isDead = false;
+        this->scale = 1;
         this->radius = TURRET_SIZE / 0.95f;
         this->x = -1000;
         this->y = -1000;
+        this->type = "";
     }
 };
