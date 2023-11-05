@@ -9,12 +9,13 @@ class Enemy
 public:
     int row;
     int life = 3;
-    int translateX = 1000;
+    int translateX = 1350;
     int translateY;
     float scale = 1.0f;
     std::string type_mesh;
     int timeAppear;
     bool isDead = false;
+    float radius = HEXAGON_SIZE;
 
     Enemy()
     {
@@ -30,21 +31,20 @@ public:
     }
 
     int renderEnemy(float deltaTime)
-    {
+    {   
+        if (this->scale <= 0) {
+            return 0;
+        }
+
         if (this->translateX >= 50) {
             this->translateX -= deltaTime * 100;
         } else if (this->scale > 0){
             this->scale -= deltaTime;
-        } else if (this->scale == 0) {
-            return 0;
-        
-        }
+        };
 
         if (this->life <= 0) {
             this->scale -= deltaTime * 10;
             this->isDead = true;
-        } else if (this->scale == 0) {
-            return 0;
         }
 
         return 1;

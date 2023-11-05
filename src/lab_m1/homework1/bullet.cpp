@@ -6,6 +6,7 @@ public:
     int y;
     std::string type;
     bool isDead = true;
+    float radius = STAR_SIZE / 1.47f;
 
     Bullet() {}
 
@@ -19,12 +20,12 @@ public:
 
     bool isBulletDead(int resolution_x, float deltaTimeSeconds)
     {
-        if (this->x >= resolution_x)
+        if (this->isDead || this->x >= resolution_x )
         {
             this->isDead = true;
             return true;
         }
-        this->x += deltaTimeSeconds * 100;
+        this->x += deltaTimeSeconds * 200;
         return false;
     }
 

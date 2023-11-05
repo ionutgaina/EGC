@@ -12,3 +12,4 @@
 #define STAR_SIZE 25
 #define HEXAGON_SIZE 25
 #define ENEMY_SIZE 5
+#define TURRET_COOLDOWN 100.0f

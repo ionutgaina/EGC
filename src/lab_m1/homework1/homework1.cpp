@@ -140,12 +140,13 @@ void Homework1::Update(float deltaTimeSeconds)
 
                 if (turretPlaced[i][j - 1].type != "")
                 {
+                    turretPlaced[i][j - 1].x = (SQUARE_SIZE + SQUARE_GRID_SPACE) * j - 30 + cx;
+                    turretPlaced[i][j - 1].y = (SQUARE_SIZE + SQUARE_GRID_SPACE) * i + SQUARE_GRID_SPACE + cy;
                     modelMatrix = glm::mat3(1);
-                    modelMatrix *= transform2D::Translate((SQUARE_SIZE + SQUARE_GRID_SPACE) * j - 30 + cx, (SQUARE_SIZE + SQUARE_GRID_SPACE) * i + SQUARE_GRID_SPACE + cy);
+                    modelMatrix *= transform2D::Translate(turretPlaced[i][j - 1].x, turretPlaced[i][j - 1].y);
                     RenderMesh2D(meshes[turretPlaced[i][j - 1].type], shaders["VertexColor"], modelMatrix);
                     if (turretPlaced[i][j - 1].isShootReady(deltaTimeSeconds))
                     {
-                        cout << "shoot\n";
                         if (bulletCount > 100)
                         {
                             bulletCount = 0;
@@ -221,6 +222,39 @@ void Homework1::Update(float deltaTimeSeconds)
                     RenderMesh2D(meshes[enemy[i].type_mesh], shaders["VertexColor"], modelMatrix);
                     modelMatrix *= transform2D::Scale(enemy[i].scale * .75f, enemy[i].scale * .75f);
                     RenderMesh2D(meshes["inner_hex"], shaders["VertexColor"], modelMatrix);
+
+                    for (int j = 0; j < 100; j++)
+                    {
+                        if (bullet[j].isDead)
+                        {
+                            continue;
+                        }
+
+                        float distance = sqrt(pow(bullet[j].x - enemy[i].translateX, 2) + pow(bullet[j].y - enemy[i].translateY, 2));
+                        if (distance <= bullet[j].radius + enemy[i].radius)
+                        {
+                            if (bullet[j].getBulletType() == "blue_star" && enemy[i].type_mesh == "blue_hex")
+                            {
+                                enemy[i].life--;
+                                bullet[j].isDead = true;
+                            }
+                            else if (bullet[j].getBulletType() == "orange_star" && enemy[i].type_mesh == "orange_hex")
+                            {
+                                enemy[i].life--;
+                                bullet[j].isDead = true;
+                            }
+                            else if (bullet[j].getBulletType() == "yellow_star" && enemy[i].type_mesh == "yellow_hex")
+                            {
+                                enemy[i].life--;
+                                bullet[j].isDead = true;
+                            }
+                            else if (bullet[j].getBulletType() == "purple_star" && enemy[i].type_mesh == "purple_hex")
+                            {
+                                enemy[i].life--;
+                                bullet[j].isDead = true;
+                            }
+                        }
+                    }
                 }
 
                 if (enemy[i].translateX <= 50 && !enemy[i].isDead)
@@ -239,6 +273,9 @@ void Homework1::Update(float deltaTimeSeconds)
             modelMatrix *= transform2D::Translate(turretX, resolution.y - turretY);
             RenderMesh2D(meshes[turretNames[turretSelectedIndex]], shaders["VertexColor"], modelMatrix);
         }
+    }
+
+    { // collisions
     }
 
     // TODO win if timePassed > 1000
