@@ -121,7 +121,13 @@ void Homework1::FrameStart()
 }
 
 void Homework1::Update(float deltaTimeSeconds)
-{
+{   
+    if (life <= 0)
+    {
+        cout << "You lost!" << endl;
+        exit(0);
+    }
+
     { // Game scene
         // Kill zone for friendly team
         modelMatrix = glm::mat3(1);
@@ -363,6 +369,24 @@ void Homework1::OnMouseBtnPress(int mouseX, int mouseY, int button, int mods)
     // Add mouse button press event
     if (IS_BIT_SET(button, GLFW_MOUSE_BUTTON_LEFT))
     {
+
+        for (int i = 1; i <= SQUARE_GRID_SIZE; i++)
+        {
+            for (int j = 1; j <= SQUARE_GRID_SIZE; j++)
+            {
+                if (mouseX >= (SQUARE_SIZE + SQUARE_GRID_SPACE) * j - 30 && (SQUARE_SIZE + SQUARE_GRID_SPACE) * j - 30 + SQUARE_SIZE >= mouseX)
+                {
+                    if (mouseY >= resolution.y - (SQUARE_SIZE + SQUARE_GRID_SPACE) * i && resolution.y - (SQUARE_SIZE + SQUARE_GRID_SPACE) * i + SQUARE_SIZE >= mouseY)
+                    {
+                        if (turretPlaced[i - 1][j - 1].type != "")
+                        {
+                            turretPlaced[i - 1][j - 1].isDead = true;
+                        }
+                    }
+                }
+            }
+        }
+
         for (int i = 1; i <= 4; i++)
         {
             if (mouseX + cx >= ((SQUARE_SIZE + SQUARE_GRID_SPACE)) * i + SQUARE_GRID_SPACE && ((SQUARE_SIZE + SQUARE_GRID_SPACE)) * i + SQUARE_SIZE + SQUARE_GRID_SPACE >= mouseX + cx)

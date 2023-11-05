@@ -49,7 +49,6 @@ public:
         if (this->isDead)
         {
             this->scale -= deltaTimeSeconds * 5;
-            return true;
         }
         return false;
     }
