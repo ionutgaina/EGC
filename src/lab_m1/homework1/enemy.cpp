@@ -27,7 +27,7 @@ public:
         std::string enemyTypes[] = {"blue_hex", "orange_hex", "yellow_hex", "purple_hex"};
 
         this->type_mesh = enemyTypes[rand() % 4];
-        this->timeAppear = rand() % 2500;
+        this->timeAppear = rand() % GAME_TIME;
     }
 
     int renderEnemy(float deltaTime)

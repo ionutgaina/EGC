@@ -87,6 +87,10 @@ void Homework1::Init()
     star = object2D::CreateStar("purple_star", glm::vec3(0, 0, 1), STAR_SIZE, glm::vec3(0.5f, 0, 1));
     AddMeshToList(star);
 
+    // pink star
+    star = object2D::CreateStar("point_star", glm::vec3(0, 0, 2), STAR_SIZE, glm::vec3(1, 0, 1));
+    AddMeshToList(star);
+
     // start hexagon
     Mesh *hex;
 
@@ -322,7 +326,25 @@ void Homework1::Update(float deltaTimeSeconds)
         }
     }
 
-    { // collisions
+    { // stars
+        if (timePassed % STAR_APPEAR_TIME == 0)
+        {
+            stars.push_back(Star(timePassed));
+        }
+
+
+        for (int i = 0; i < stars.size(); i++)
+        {
+            if (!stars[i].renderStar(timePassed, deltaTimeSeconds))
+            {
+                stars.erase(stars.begin() + i);
+                continue;
+            }
+            modelMatrix = glm::mat3(1);
+            modelMatrix *= transform2D::Translate(stars[i].x, stars[i].y);
+            modelMatrix *= transform2D::Scale(stars[i].scale, stars[i].scale);
+            RenderMesh2D(meshes["point_star"], shaders["VertexColor"], modelMatrix);
+        }
     }
 
     // TODO win if timePassed > 1000
@@ -400,6 +422,15 @@ void Homework1::OnMouseBtnPress(int mouseX, int mouseY, int button, int mods)
                         turretSelectedIndex = i - 1;
                         turretSelected = true;
                     }
+                }
+            }
+        }
+
+        for (int i = 0 ; i < stars.size(); i++)
+        {
+            if(stars[i].isStarCollected(mouseX, mouseY, resolution.y)) {
+                if (currency < 15) {
+                    currency++;
                 }
             }
         }

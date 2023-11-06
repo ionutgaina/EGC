@@ -7,6 +7,7 @@
 #include "lab_m1/homework1/enemy.cpp"
 #include "lab_m1/homework1/turret.cpp"
 #include "lab_m1/homework1/bullet.cpp"
+#include "lab_m1/homework1/star.cpp"
 
 namespace m1
 {
@@ -44,7 +45,7 @@ namespace m1
 
       int life = 3;
       int currency = 10;
-      long timePassed = 0;
+      long timePassed = 1;
       Enemy enemy[ENEMY_SIZE];
 
       std::string turretNames[4] = {"blue_turret", "orange_turret", "yellow_turret", "purple_turret"};
@@ -59,6 +60,7 @@ namespace m1
 
       Turret turretPlaced[SQUARE_GRID_SIZE][SQUARE_GRID_SIZE];
       Bullet bullet[100];
+      vector<Star> stars;
       int bulletCount = 0;
    };
 } // namespace m1
