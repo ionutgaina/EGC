@@ -111,6 +111,11 @@ void Homework1::Init()
     {
         enemy[i] = Enemy();
     }
+
+    for (int i = 0; i < ENEMY_SIZE; i++)
+    {
+        enemy[i].generateTimeAppear(i * 100);
+    }
 }
 
 void Homework1::FrameStart()
@@ -390,8 +395,7 @@ void Homework1::OnMouseBtnPress(int mouseX, int mouseY, int button, int mods)
 {
     // Add mouse button press event
     if (IS_BIT_SET(button, GLFW_MOUSE_BUTTON_LEFT))
-    {
-
+    {   
         for (int i = 1; i <= SQUARE_GRID_SIZE; i++)
         {
             for (int j = 1; j <= SQUARE_GRID_SIZE; j++)
@@ -425,12 +429,16 @@ void Homework1::OnMouseBtnPress(int mouseX, int mouseY, int button, int mods)
                 }
             }
         }
+    }
 
+    if (IS_BIT_SET(button, GLFW_MOUSE_BUTTON_RIGHT))
+    {
         for (int i = 0 ; i < stars.size(); i++)
         {
             if(stars[i].isStarCollected(mouseX, mouseY, resolution.y)) {
                 if (currency < 15) {
                     currency++;
+                    return;
                 }
             }
         }

@@ -118,13 +118,13 @@ Mesh *object2D ::CreateHexagon(
 
     std::vector<VertexFormat> vertices =
         {
-            VertexFormat(middlePoint, color),                           // center
-            VertexFormat(middlePoint + glm::vec3(-length/2, length, 0), color),  // left top
-            VertexFormat(middlePoint + glm::vec3(length/2, length, 0), color),   // right top
-            VertexFormat(middlePoint + glm::vec3(length, 0, 0), color),      // right
-            VertexFormat(middlePoint + glm::vec3(length/2, -length, 0), color),  // right bottom
-            VertexFormat(middlePoint + glm::vec3(-length/2, -length, 0), color), // left bottom
-            VertexFormat(middlePoint + glm::vec3(-length, 0, 0), color),     // left
+            VertexFormat(middlePoint, color),                                      // center
+            VertexFormat(middlePoint + glm::vec3(-length / 2, length, 0), color),  // left top
+            VertexFormat(middlePoint + glm::vec3(length / 2, length, 0), color),   // right top
+            VertexFormat(middlePoint + glm::vec3(length, 0, 0), color),            // right
+            VertexFormat(middlePoint + glm::vec3(length / 2, -length, 0), color),  // right bottom
+            VertexFormat(middlePoint + glm::vec3(-length / 2, -length, 0), color), // left bottom
+            VertexFormat(middlePoint + glm::vec3(-length, 0, 0), color),           // left
         };
 
     Mesh *hexagon = new Mesh(name);

@@ -25,7 +25,7 @@ public:
             this->isDead = true;
             return true;
         }
-        this->x += deltaTimeSeconds * 200;
+        this->x += deltaTimeSeconds * 250;
         return false;
     }
 
