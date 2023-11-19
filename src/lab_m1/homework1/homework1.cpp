@@ -91,10 +91,13 @@ void Homework1::Init()
     star = object2D::CreateStar("point_star", glm::vec3(0, 0, 2), STAR_SIZE, glm::vec3(1, 0, 1));
     AddMeshToList(star);
 
+    star = object2D::CreateStar("white_star", glm::vec3(0, 0, 20), STAR_SIZE, glm::vec3(1, 1, 1));
+    AddMeshToList(star);
+
     // start hexagon
     Mesh *hex;
 
-    hex = object2D::CreateHexagon("inner_hex", glm::vec3(0, 0, 11), HEXAGON_SIZE, glm::vec3(0.5f, 1.0f, 0));
+    hex = object2D::CreateHexagon("inner_hex", glm::vec3(0, 0, 11), HEXAGON_SIZE - 5, glm::vec3(0.5f, 1.0f, 0));
     AddMeshToList(hex);
     hex = object2D::CreateHexagon("blue_hex", glm::vec3(0, 0, 10), HEXAGON_SIZE, glm::vec3(0, 0, 1));
     AddMeshToList(hex);
@@ -116,6 +119,14 @@ void Homework1::Init()
     {
         enemy[i].generateTimeAppear(i * 100);
     }
+
+    for (int i = 0; i < SQUARE_GRID_SIZE; i++)
+    {
+        int x = SQUARE_GRID_SPACE + cx / 2;
+        int y = (SQUARE_SIZE + SQUARE_GRID_SPACE) * i + SQUARE_GRID_SPACE + cy;
+        Lawnmower lawnmower = Lawnmower(x, y, i);
+        lawnmowers.push_back(lawnmower);
+    }
 }
 
 void Homework1::FrameStart()
@@ -130,7 +141,7 @@ void Homework1::FrameStart()
 }
 
 void Homework1::Update(float deltaTimeSeconds)
-{   
+{
     if (life <= 0)
     {
         cout << "You lost!" << endl;
@@ -143,6 +154,38 @@ void Homework1::Update(float deltaTimeSeconds)
         modelMatrix *= transform2D::Translate(SQUARE_GRID_SPACE, SQUARE_GRID_SPACE);
         modelMatrix *= transform2D::Scale(0.5f, 3.4f);
         RenderMesh2D(meshes["red_square"], shaders["VertexColor"], modelMatrix);
+
+        for (int i = 0; i < lawnmowers.size(); i++)
+        {
+
+            modelMatrix = glm::mat3(1);
+            modelMatrix *= transform2D::Translate(lawnmowers[i].x, lawnmowers[i].y);
+            modelMatrix *= transform2D::Scale(1.5f, 1.5f);
+            if (lawnmowers[i].isActivated)
+            {
+                modelMatrix *= transform2D::Rotate(angularStep);
+            }
+            RenderMesh2D(meshes["white_star"], shaders["VertexColor"], modelMatrix);
+
+            modelMatrix = glm::mat3(1);
+            modelMatrix *= transform2D::Translate(lawnmowers[i].x, lawnmowers[i].y);
+            modelMatrix *= transform2D::Scale(1.5f, 1.5f);
+            if (lawnmowers[i].isActivated)
+            {
+                modelMatrix *= transform2D::Rotate(90 + angularStep);
+            }
+            else
+            {
+                modelMatrix *= transform2D::Rotate(90);
+            }
+            RenderMesh2D(meshes["white_star"], shaders["VertexColor"], modelMatrix);
+
+            lawnmowers[i].Update(deltaTimeSeconds);
+            if (lawnmowers[i].isDead)
+            {
+                lawnmowers.erase(lawnmowers.begin() + i);
+            }
+        }
 
         // Squares for friendly team
         for (int i = 0; i < SQUARE_GRID_SIZE; i++)
@@ -167,13 +210,13 @@ void Homework1::Update(float deltaTimeSeconds)
                     else
                     {
                         continue;
-                    }   
+                    }
 
                     turretPlaced[i][j - 1].isShootReady(deltaTimeSeconds);
 
                     for (int k = 0; k < ENEMY_SIZE; k++)
-                    {   
-                        if (turretPlaced[i][j-1].readyForShot && enemy[k].row == i && !enemy[k].isDead && enemy[k].timeAppear <= timePassed)
+                    {
+                        if (turretPlaced[i][j - 1].readyForShot && enemy[k].row == i && !enemy[k].isDead && enemy[k].timeAppear <= timePassed)
                         {
                             if (turretPlaced[i][j - 1].type == "blue_turret" && enemy[k].type_mesh == "blue_hex")
                             {
@@ -197,7 +240,7 @@ void Homework1::Update(float deltaTimeSeconds)
                             }
                             turretPlaced[i][j - 1].readyForShot = false;
                         }
-                        
+
                         if (enemy[k].isDead)
                         {
                             continue;
@@ -313,10 +356,21 @@ void Homework1::Update(float deltaTimeSeconds)
                     }
                 }
 
-                if (enemy[i].translateX <= 50 && !enemy[i].isDead)
+                if (enemy[i].translateX <= 25 && !enemy[i].isDead)
                 {
                     life--;
                     enemy[i].isDead = true;
+                }
+                else if (enemy[i].translateX <= 75 && !enemy[i].isDead)
+                {
+                    int row = enemy[i].row;
+                    for (int j = 0; j < lawnmowers.size(); j++)
+                    {
+                        if (lawnmowers[j].row == row)
+                        {
+                            lawnmowers[j].isActivated = true;
+                        }
+                    }
                 }
             }
         }
@@ -336,7 +390,6 @@ void Homework1::Update(float deltaTimeSeconds)
         {
             stars.push_back(Star(timePassed));
         }
-
 
         for (int i = 0; i < stars.size(); i++)
         {
@@ -395,7 +448,7 @@ void Homework1::OnMouseBtnPress(int mouseX, int mouseY, int button, int mods)
 {
     // Add mouse button press event
     if (IS_BIT_SET(button, GLFW_MOUSE_BUTTON_LEFT))
-    {   
+    {
         for (int i = 1; i <= SQUARE_GRID_SIZE; i++)
         {
             for (int j = 1; j <= SQUARE_GRID_SIZE; j++)
@@ -433,10 +486,12 @@ void Homework1::OnMouseBtnPress(int mouseX, int mouseY, int button, int mods)
 
     if (IS_BIT_SET(button, GLFW_MOUSE_BUTTON_RIGHT))
     {
-        for (int i = 0 ; i < stars.size(); i++)
+        for (int i = 0; i < stars.size(); i++)
         {
-            if(stars[i].isStarCollected(mouseX, mouseY, resolution.y)) {
-                if (currency < 15) {
+            if (stars[i].isStarCollected(mouseX, mouseY, resolution.y))
+            {
+                if (currency < 15)
+                {
                     currency++;
                     return;
                 }

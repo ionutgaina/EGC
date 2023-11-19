@@ -8,6 +8,7 @@
 #include "lab_m1/homework1/turret.cpp"
 #include "lab_m1/homework1/bullet.cpp"
 #include "lab_m1/homework1/star.cpp"
+#include "lab_m1/homework1/lawnmower.cpp"
 
 namespace m1
 {
@@ -62,5 +63,6 @@ namespace m1
       Bullet bullet[100];
       vector<Star> stars;
       int bulletCount = 0;
+      vector<Lawnmower> lawnmowers;
    };
 } // namespace m1
