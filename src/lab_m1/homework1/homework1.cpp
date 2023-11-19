@@ -91,7 +91,7 @@ void Homework1::Init()
     star = object2D::CreateStar("point_star", glm::vec3(0, 0, 2), STAR_SIZE, glm::vec3(1, 0, 1));
     AddMeshToList(star);
 
-    star = object2D::CreateStar("white_star", glm::vec3(0, 0, 20), STAR_SIZE, glm::vec3(1, 1, 1));
+    star = object2D::CreateStar("white_star", glm::vec3(0, 0, 20), LAWNMOWER_SIZE, glm::vec3(1, 1, 1));
     AddMeshToList(star);
 
     // start hexagon
@@ -117,7 +117,7 @@ void Homework1::Init()
 
     for (int i = 0; i < ENEMY_SIZE; i++)
     {
-        enemy[i].generateTimeAppear(i * 100);
+        enemy[i].generateTimeAppear(i * 200);
     }
 
     for (int i = 0; i < SQUARE_GRID_SIZE; i++)
@@ -160,19 +160,17 @@ void Homework1::Update(float deltaTimeSeconds)
 
             modelMatrix = glm::mat3(1);
             modelMatrix *= transform2D::Translate(lawnmowers[i].x, lawnmowers[i].y);
-            modelMatrix *= transform2D::Scale(1.5f, 1.5f);
             if (lawnmowers[i].isActivated)
             {
-                modelMatrix *= transform2D::Rotate(angularStep);
+                modelMatrix *= transform2D::Rotate(angularStep*2);
             }
             RenderMesh2D(meshes["white_star"], shaders["VertexColor"], modelMatrix);
 
             modelMatrix = glm::mat3(1);
             modelMatrix *= transform2D::Translate(lawnmowers[i].x, lawnmowers[i].y);
-            modelMatrix *= transform2D::Scale(1.5f, 1.5f);
             if (lawnmowers[i].isActivated)
             {
-                modelMatrix *= transform2D::Rotate(90 + angularStep);
+                modelMatrix *= transform2D::Rotate(90 + angularStep*2);
             }
             else
             {
@@ -354,14 +352,30 @@ void Homework1::Update(float deltaTimeSeconds)
                             }
                         }
                     }
+                    
+                    for (int j = 0; j < lawnmowers.size(); j++) // collision with lawnmowers
+                    {
+                        if (lawnmowers[j].isDead)
+                        {
+                            continue;
+                        }
+
+                        float distance = sqrt(pow(lawnmowers[j].x - enemy[i].translateX, 2) + pow(lawnmowers[j].y - enemy[i].translateY, 2));
+                        if (distance <= LAWNMOWER_SIZE + enemy[i].radius && lawnmowers[j].isActivated && !enemy[i].isDead)
+                        {
+                            std::cout << "Lawnmower collision" << std::endl;
+                            enemy[i].life = 0;
+                        }
+                    }
                 }
 
-                if (enemy[i].translateX <= 25 && !enemy[i].isDead)
+                if (enemy[i].translateX <= 50 && !enemy[i].isDead)
                 {
+                    std::cout << "Enemy collision" << std::endl;
                     life--;
                     enemy[i].isDead = true;
                 }
-                else if (enemy[i].translateX <= 75 && !enemy[i].isDead)
+                else if (enemy[i].translateX <= 100 && !enemy[i].isDead)
                 {
                     int row = enemy[i].row;
                     for (int j = 0; j < lawnmowers.size(); j++)
