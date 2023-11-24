@@ -1,4 +1,4 @@
-#include "lab_m1/lab7/lab7.h"
+#include "lab_m1/homework2/homework2.h"
 
 #include <vector>
 #include <string>
@@ -14,17 +14,17 @@ using namespace m1;
  */
 
 
-Lab7::Lab7()
+Homework2::Homework2()
 {
 }
 
 
-Lab7::~Lab7()
+Homework2::~Homework2()
 {
 }
 
 
-void Lab7::Init()
+void Homework2::Init()
 {
     {
         Mesh* mesh = new Mesh("box");
@@ -47,8 +47,8 @@ void Lab7::Init()
     // Create a shader program for drawing face polygon with the color of the normal
     {
         Shader *shader = new Shader("LabShader");
-        shader->AddShader(PATH_JOIN(window->props.selfDir, SOURCE_PATH::M1, "lab7", "shaders", "VertexShader.glsl"), GL_VERTEX_SHADER);
-        shader->AddShader(PATH_JOIN(window->props.selfDir, SOURCE_PATH::M1, "lab7", "shaders", "FragmentShader.glsl"), GL_FRAGMENT_SHADER);
+        shader->AddShader(PATH_JOIN(window->props.selfDir, SOURCE_PATH::M1, "homework2", "shaders", "VertexShader.glsl"), GL_VERTEX_SHADER);
+        shader->AddShader(PATH_JOIN(window->props.selfDir, SOURCE_PATH::M1, "homework2", "shaders", "FragmentShader.glsl"), GL_FRAGMENT_SHADER);
         shader->CreateAndLink();
         shaders[shader->GetName()] = shader;
     }
@@ -56,14 +56,14 @@ void Lab7::Init()
     // Light & material properties
     {
         lightPosition = glm::vec3(0, 1, 1);
-        materialShininess = 30;
-        materialKd = 0.5;
-        materialKs = 0.5;
+        materialShininess = 50;
+        materialKd = 0.75;
+        materialKs = 0.75;
     }
 }
 
 
-void Lab7::FrameStart()
+void Homework2::FrameStart()
 {
     // Clears the color buffer (using the previously set color) and depth buffer
     glClearColor(0, 0, 0, 1);
@@ -75,7 +75,7 @@ void Lab7::FrameStart()
 }
 
 
-void Lab7::Update(float deltaTimeSeconds)
+void Homework2::Update(float deltaTimeSeconds)
 {
     {
         glm::mat4 modelMatrix = glm::mat4(1);
@@ -116,13 +116,13 @@ void Lab7::Update(float deltaTimeSeconds)
 }
 
 
-void Lab7::FrameEnd()
+void Homework2::FrameEnd()
 {
     DrawCoordinateSystem();
 }
 
 
-void Lab7::RenderSimpleMesh(Mesh *mesh, Shader *shader, const glm::mat4 & modelMatrix, const glm::vec3 &color)
+void Homework2::RenderSimpleMesh(Mesh *mesh, Shader *shader, const glm::mat4 & modelMatrix, const glm::vec3 &color)
 {
     if (!mesh || !shader || !shader->GetProgramID())
         return;
@@ -174,7 +174,7 @@ void Lab7::RenderSimpleMesh(Mesh *mesh, Shader *shader, const glm::mat4 & modelM
  */
 
 
-void Lab7::OnInputUpdate(float deltaTime, int mods)
+void Homework2::OnInputUpdate(float deltaTime, int mods)
 {
     float speed = 2;
 
@@ -196,41 +196,41 @@ void Lab7::OnInputUpdate(float deltaTime, int mods)
 }
 
 
-void Lab7::OnKeyPress(int key, int mods)
+void Homework2::OnKeyPress(int key, int mods)
 {
     // Add key press event
 }
 
 
-void Lab7::OnKeyRelease(int key, int mods)
+void Homework2::OnKeyRelease(int key, int mods)
 {
     // Add key release event
 }
 
 
-void Lab7::OnMouseMove(int mouseX, int mouseY, int deltaX, int deltaY)
+void Homework2::OnMouseMove(int mouseX, int mouseY, int deltaX, int deltaY)
 {
     // Add mouse move event
 }
 
 
-void Lab7::OnMouseBtnPress(int mouseX, int mouseY, int button, int mods)
+void Homework2::OnMouseBtnPress(int mouseX, int mouseY, int button, int mods)
 {
     // Add mouse button press event
 }
 
 
-void Lab7::OnMouseBtnRelease(int mouseX, int mouseY, int button, int mods)
+void Homework2::OnMouseBtnRelease(int mouseX, int mouseY, int button, int mods)
 {
     // Add mouse button release event
 }
 
 
-void Lab7::OnMouseScroll(int mouseX, int mouseY, int offsetX, int offsetY)
+void Homework2::OnMouseScroll(int mouseX, int mouseY, int offsetX, int offsetY)
 {
 }
 
 
-void Lab7::OnWindowResize(int width, int height)
+void Homework2::OnWindowResize(int width, int height)
 {
 }

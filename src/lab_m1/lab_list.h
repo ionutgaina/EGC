@@ -9,3 +9,4 @@
 #include "lab_m1/lab8/lab8.h"
 #include "lab_m1/lab9/lab9.h"
 #include "lab_m1/homework1/homework1.h"
+#include "lab_m1/homework2/homework2.h"

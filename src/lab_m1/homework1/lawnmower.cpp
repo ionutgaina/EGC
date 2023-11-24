@@ -1,4 +1,8 @@
+using namespace std;
 
+#pragma once
+
+#include "lab_m1/homework1/utils.hpp"
 class Lawnmower
 {
 public:
