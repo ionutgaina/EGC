@@ -2,6 +2,8 @@
 
 #include "components/simple_scene.h"
 #include "lab_m1/homework2/camera.h"
+#include "lab_m1/homework2/classes/tank.cpp"
+#include "lab_m1/homework2/classes/ball.cpp"
 
 namespace hw2
 {
@@ -28,8 +30,9 @@ namespace hw2
       void OnMouseBtnRelease(int mouseX, int mouseY, int button, int mods) override;
       void OnMouseScroll(int mouseX, int mouseY, int offsetX, int offsetY) override;
       void OnWindowResize(int width, int height) override;
-
-      void RenderTank();
+      void RenderTank(Tank *tank);
+      void RenderBall(Ball *ball);
+      glm::mat4 SpawnModelMatrix(glm::vec3 position, float rotation = 0);
 
    protected:
       Camera *camera;
@@ -47,5 +50,12 @@ namespace hw2
       unsigned int materialShininess;
       float materialKd;
       float materialKs;
+
+      vector<Ball> bullets;
+      Tank* friendlyTank;
+
+      Ball testBal;
+
+      float timePassed = 0;
    };
 } // namespace m1
