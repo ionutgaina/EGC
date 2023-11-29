@@ -66,17 +66,19 @@ void gfxc::CameraInput::OnMouseMove(int mouseX, int mouseY, int deltaX, int delt
 
 void gfxc::CameraInput::OnMouseBtnPress(int mouseX, int mouseY, int button, int mods)
 {
-    if (IS_BIT_SET(button, GLFW_MOUSE_BUTTON_RIGHT))
-    {
-        window->DisablePointer();
-    }
+    // HOMEWORK2
+    // if (IS_BIT_SET(button, GLFW_MOUSE_BUTTON_RIGHT))
+    // {
+    //     window->DisablePointer();
+    // }
 }
 
 
 void gfxc::CameraInput::OnMouseBtnRelease(int mouseX, int mouseY, int button, int mods)
 {
-    if (IS_BIT_SET(button, GLFW_MOUSE_BUTTON_RIGHT))
-    {
-        window->ShowPointer();
-    }
+    // HOMEWORK2
+    // if (IS_BIT_SET(button, GLFW_MOUSE_BUTTON_RIGHT))
+    // {
+    //     window->ShowPointer();
+    // }
 }

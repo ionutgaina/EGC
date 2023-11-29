@@ -22,6 +22,7 @@ Homework2::~Homework2()
 
 void Homework2::Init()
 {
+    window->DisablePointer();
     renderCameraTarget = false;
 
     fov = 50.f;
@@ -118,7 +119,6 @@ void Homework2::Update(float deltaTimeSeconds)
                 i--;
             }
         }
-
     }
 
     // DEBUG PURPOSE
@@ -175,23 +175,22 @@ void Homework2::OnInputUpdate(float deltaTime, int mods)
     else if (window->KeyHold(GLFW_KEY_A))
     {
         // Translate the camera to the left
-        camera->RotateThirdPerson_OY(-deltaTime);
-        friendlyTank->rotateBody(-deltaTime);
+        camera->RotateThirdPerson_OY(deltaTime);
+        friendlyTank->rotateBody(deltaTime);
     }
     else if (window->KeyHold(GLFW_KEY_D))
     {
         // Translate the camera to the right
-        camera->RotateThirdPerson_OY(deltaTime);
-        friendlyTank->rotateBody(deltaTime);
+        camera->RotateThirdPerson_OY(-deltaTime);
+        friendlyTank->rotateBody(-deltaTime);
     }
-
 
     // DEBUG PURPOSE
     if (window->KeyHold(GLFW_KEY_UP))
     {
         testBal.z += deltaTime;
     }
-     if (window->KeyHold(GLFW_KEY_DOWN))
+    if (window->KeyHold(GLFW_KEY_DOWN))
     {
         testBal.z -= deltaTime;
     }
@@ -199,7 +198,7 @@ void Homework2::OnInputUpdate(float deltaTime, int mods)
     {
         testBal.x += deltaTime;
     }
-     if (window->KeyHold(GLFW_KEY_RIGHT))
+    if (window->KeyHold(GLFW_KEY_RIGHT))
     {
         testBal.x -= deltaTime;
     }
@@ -207,7 +206,7 @@ void Homework2::OnInputUpdate(float deltaTime, int mods)
     {
         testBal.y += deltaTime;
     }
-     if (window->KeyHold(GLFW_KEY_KP_SUBTRACT))
+    if (window->KeyHold(GLFW_KEY_KP_SUBTRACT))
     {
         testBal.y -= deltaTime;
     }
@@ -235,17 +234,17 @@ void Homework2::OnMouseMove(int mouseX, int mouseY, int deltaX, int deltaY)
     {
         float sensivityOX = 0.001f;
         float sensivityOY = 0.001f;
-
         if (window->GetSpecialKeyState() == 0)
         {
             // DEBUG PURPOSE
-            camera->RotateThirdPerson_OX(sensivityOX * -deltaY);
+            camera->RotateThirdPerson_OY(sensivityOX * -deltaX);
             // camera->RotateThirdPerson_OY(sensivityOY * -deltaX);
-
-
-            friendlyTank->rotateTurret(sensivityOY * -deltaX);
-            // friendlyTank->rotateCannon(sensivityOX * -deltaY);
         }
+    }
+    else if (window->GetSpecialKeyState() == 0)
+    {
+        float sensitivyOY = 0.001f;
+        friendlyTank->rotateTurret(sensitivyOY * -deltaX);
     }
 }
 
