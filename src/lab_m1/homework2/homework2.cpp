@@ -1,9 +1,5 @@
 #include "lab_m1/homework2/homework2.h"
 
-#include <vector>
-#include <string>
-#include <iostream>
-
 using namespace std;
 using namespace hw2;
 
@@ -64,6 +60,12 @@ void Homework2::Init()
     }
 
     {
+        Mesh *mesh = new Mesh("house");
+        mesh->LoadMesh(PATH_JOIN(window->props.selfDir, RESOURCE_PATH::MODELS, "primitives"), "box.obj");
+        meshes[mesh->GetMeshID()] = mesh;
+    }
+
+    {
         Shader *shader = new Shader("TankShader");
         shader->AddShader(PATH_JOIN(window->props.selfDir, SOURCE_PATH::M1, "homework2", "shaders", "VertexShader.glsl"), GL_VERTEX_SHADER);
         shader->AddShader(PATH_JOIN(window->props.selfDir, SOURCE_PATH::M1, "homework2", "shaders", "FragmentShader.glsl"), GL_FRAGMENT_SHADER);
@@ -79,6 +81,23 @@ void Homework2::Init()
     }
 
     projectionMatrix = glm::perspective(RADIANS(fov), window->props.aspectRatio, .01f, 200.f);
+
+    // Load houses
+    {
+        vector<MyGameObject> collisionObjects;
+        collisionObjects.push_back(*friendlyTank);
+        for (int i = 0; i < enemyTanks.size(); i++)
+        {
+            collisionObjects.push_back(enemyTanks[i]);
+        }
+
+        for (int i = 0; i < houseCount; i++)
+        {
+            House *house = new House(collisionObjects);
+            houses.push_back(house);
+            cout << "House " << i << " at " << house->x << " " << house->z << endl;
+        }
+    }
 }
 
 void Homework2::FrameStart()
@@ -118,6 +137,18 @@ void Homework2::Update(float deltaTimeSeconds)
                 bullets.erase(bullets.begin() + i);
                 i--;
             }
+        }
+    }
+
+    { // render Houses
+        for (House *house : houses)
+        {
+            glm::vec3 house_position = glm::vec3(house->x, house->y, house->z);
+
+            glm::mat4 modelMatrix = glm::mat4(1.0f);
+            modelMatrix = glm::translate(modelMatrix, house_position);
+            modelMatrix = glm::scale(modelMatrix, glm::vec3(house->scale));
+            RenderMesh(meshes["house"], shaders["simpleShader"], modelMatrix, glm::vec3(0.1f, 0.1f, 0.1f));
         }
     }
 
@@ -232,16 +263,13 @@ void Homework2::OnMouseMove(int mouseX, int mouseY, int deltaX, int deltaY)
 
     if (window->MouseHold(GLFW_MOUSE_BUTTON_RIGHT))
     {
-        float sensivityOX = 0.001f;
         float sensivityOY = 0.001f;
-        if (window->GetSpecialKeyState() == 0)
-        {
-            // DEBUG PURPOSE
-            camera->RotateThirdPerson_OY(sensivityOX * -deltaX);
-            // camera->RotateThirdPerson_OY(sensivityOY * -deltaX);
-        }
+        auxDeltaX = sensivityOY * -deltaX;
+        // float auxDeltaY = sensivityOY * -deltaY;
+        camera->RotateThirdPerson_OY(auxDeltaX);
+        // camera->RotateThirdPerson_OX(auxDeltaY);
     }
-    else if (window->GetSpecialKeyState() == 0)
+    else
     {
         float sensitivyOY = 0.001f;
         friendlyTank->rotateTurret(sensitivyOY * -deltaX);

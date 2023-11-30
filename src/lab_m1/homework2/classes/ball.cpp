@@ -1,13 +1,12 @@
-#include "../utils.h"
+#include "../utils.hpp"
+#include "utils.hpp"
 
 using namespace std;
 
-class Ball
+class Ball : public MyGameObject
 {
 public:
-    float x = 0;
     float y = 3.2f;
-    float z = 0;
 
     float rotation_OX = 0;
     float rotation_OZ = 0;
@@ -32,11 +31,9 @@ public:
 
         float x_speed = speed * sin(rotation_OZ);
         float z_speed = speed * cos(rotation_OZ);
-        // float y_speed = speed * sin(-rotation_OX);
 
-        x += x_speed * deltaTimeSeconds;
-        z += z_speed * deltaTimeSeconds;
-        // y += y_speed * deltaTimeSeconds;
+        this->x += x_speed * deltaTimeSeconds;
+        this->z += z_speed * deltaTimeSeconds;
     }
 
     bool isValid(float time)
@@ -49,8 +46,8 @@ public:
 
     void debug()
     {
-        cout << "x: " << x << endl;
-        cout << "y: " << y << endl;
-        cout << "z: " << z << endl;
+        cout << "x: " << this->x << endl;
+        cout << "y: " << this->y << endl;
+        cout << "z: " << this->z << endl;
     }
 };

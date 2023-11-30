@@ -2,8 +2,11 @@
 
 #include "components/simple_scene.h"
 #include "lab_m1/homework2/camera.h"
+#include "lab_m1/homework2/classes/house.cpp"
 #include "lab_m1/homework2/classes/tank.cpp"
 #include "lab_m1/homework2/classes/ball.cpp"
+#include "utils.hpp"
+#include "classes/utils.hpp"
 
 namespace hw2
 {
@@ -44,7 +47,7 @@ namespace hw2
 
       GLfloat fov;
 
-      float cameraSpeed = 4.0f;
+      float cameraSpeed = 10.0f;
 
       glm::vec3 lightPosition;
       unsigned int materialShininess;
@@ -54,8 +57,14 @@ namespace hw2
       vector<Ball> bullets;
       Tank* friendlyTank;
 
+      vector<Tank> enemyTanks;
+
       Ball testBal;
 
       float timePassed = 0;
+
+      int houseCount = rand() % 5 + 10;
+      vector<House*> houses;
+      float auxDeltaX = 0;
    };
 } // namespace m1
