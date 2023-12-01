@@ -88,7 +88,7 @@ void Homework2::Init()
         collisionObjects.push_back(*friendlyTank);
         for (int i = 0; i < enemyTanks.size(); i++)
         {
-            collisionObjects.push_back(enemyTanks[i]);
+            collisionObjects.push_back(*enemyTanks[i]);
         }
 
         for (int i = 0; i < houseCount; i++)
@@ -127,7 +127,28 @@ void Homework2::Update(float deltaTimeSeconds)
     { // render bullets
         for (int i = 0; i < bullets.size(); i++)
         {
-            if (bullets[i].isValid(timePassed))
+            vector<MyGameObject *> collisionObjects;
+
+            collisionObjects.push_back(friendlyTank);
+            for (int j = 0; j < enemyTanks.size(); j++)
+            {
+                collisionObjects.push_back(enemyTanks[j]);
+            }
+
+            for (int j = 0; j < houses.size(); j++)
+            {
+                collisionObjects.push_back(houses[j]);
+            }
+
+            MyGameObject *hitObject = bullets[i].getCollisionObject(collisionObjects);
+
+            if (hitObject != NULL && hitObject->health > 0)
+            {
+                hitObject->health -= 1;
+                cout << "Hit probably tank" << hitObject->health << endl;
+            }
+
+            if (bullets[i].isValid(timePassed) && hitObject == NULL)
             {
                 bullets[i].Move(deltaTimeSeconds);
                 RenderBall(&bullets[i]);
@@ -194,16 +215,17 @@ void Homework2::OnInputUpdate(float deltaTime, int mods)
     if (window->KeyHold(GLFW_KEY_W))
     {
         // Translate the camera forward
-        camera->MoveForward(deltaTime * cameraSpeed);
+        camera->MoveForward(deltaTime * cameraSpeed, friendlyTank->rotation_body);
         friendlyTank->MoveForward(deltaTime * cameraSpeed);
     }
     else if (window->KeyHold(GLFW_KEY_S))
     {
         // Translate the camera backwards
-        camera->MoveForward(-deltaTime * cameraSpeed);
+        camera->MoveForward(-deltaTime * cameraSpeed, friendlyTank->rotation_body);
         friendlyTank->MoveForward(-deltaTime * cameraSpeed);
     }
-    else if (window->KeyHold(GLFW_KEY_A))
+
+    if (window->KeyHold(GLFW_KEY_A))
     {
         // Translate the camera to the left
         camera->RotateThirdPerson_OY(deltaTime);

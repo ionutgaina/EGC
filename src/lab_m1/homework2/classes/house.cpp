@@ -14,4 +14,35 @@ public:
 
         generateXandZ(objects);
     }
+
+    void generateXandZ(vector<MyGameObject> &objects)
+    {
+        random_device rd;
+        mt19937 gen(rd());
+        std::uniform_int_distribution<int> distribution(-TERRAIN_SIZE, TERRAIN_SIZE);
+
+        int ok = 1;
+
+        if (objects.size() == 0)
+        {
+            this->x = distribution(gen);
+            this->z = distribution(gen);
+        }
+
+        while (ok)
+        {
+            this->x = distribution(gen);
+            this->z = distribution(gen);
+
+            for (auto object : objects)
+            {
+                if (object.verifyInSquare(this->x, this->z, this->radius))
+                {
+                    ok = 1;
+                    break;
+                }
+                ok = 0;
+            }
+        }
+    }
 };

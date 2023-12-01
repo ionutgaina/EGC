@@ -57,7 +57,7 @@ namespace hw2
       vector<Ball> bullets;
       Tank* friendlyTank;
 
-      vector<Tank> enemyTanks;
+      vector<Tank*> enemyTanks;
 
       Ball testBal;
 

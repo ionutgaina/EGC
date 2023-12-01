@@ -1,6 +1,7 @@
 #pragma once
 #include "utils/glm_utils.h"
 #include "utils/math_utils.h"
+#include <iostream>
 
 namespace hw2
 {
@@ -33,9 +34,10 @@ namespace hw2
 				this->up		= glm::cross(right, forward);
 			}
 
-			void MoveForward(float distance)
+			void MoveForward(float distance, float rotation_body)
 			{
-				glm::vec3 dir = glm::normalize(glm::vec3(forward.x, 0, forward.z));
+				// glm::vec3 dir = glm::normalize(glm::vec3(forward.x, 0, forward.z));
+				glm::vec3 dir = glm::normalize(glm::vec3(sin(rotation_body), 0, cos(rotation_body)));
 				position += dir * distance;
 				// movement will keep the camera at the same height always
 				// Example: If you rotate up/down your head and walk forward you will still keep the same relative distance (height) to the ground!

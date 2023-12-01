@@ -10,12 +10,33 @@ public:
     float z = 0;
     float scale = 1;
     float radius = 0;
+    int health = 0;
 
     bool verifyInRadius(float x, float z, float radius)
     {
         float distance = sqrt(pow(this->x - x, 2) + pow(this->z - z, 2));
         cout << distance << " " << radius <<  " " << this->radius << endl;
         return distance < radius + this->radius;
+    }
+
+    bool verifyInSquare(float x, float z, float lengthSquare)
+    {
+        float distanceX = abs(this->x - x);
+        float distanceZ = abs(this->z - z);
+
+        if (distanceX > (lengthSquare + this->radius) || distanceZ > (lengthSquare + this->radius))
+        {
+            return false;
+        }
+
+        if (distanceX <= lengthSquare || distanceZ <= lengthSquare)
+        {
+            return true;
+        }
+
+        float cornerDistance = pow(distanceX - lengthSquare, 2) + pow(distanceZ - lengthSquare, 2);
+
+        return cornerDistance <= pow(this->radius, 2);
     }
 
     void generateXandZ(vector<MyGameObject> &objects) {
@@ -46,5 +67,17 @@ public:
                 ok = 0;
             }
         }
+    }
+
+    MyGameObject* getCollisionObject(vector<MyGameObject*> objects)
+    {
+        for (auto object : objects)
+        {
+            if (object->verifyInRadius(this->x, this->z, this->radius))
+            {
+                return object;
+            }
+        }
+        return NULL;
     }
 };

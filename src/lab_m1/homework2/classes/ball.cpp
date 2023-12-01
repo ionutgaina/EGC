@@ -20,6 +20,7 @@ public:
         this->rotation_OX = rotation_OX;
         this->rotation_OZ = rotation_OZ;
         this->startTime = startTime;
+        this->radius = 1;
     }
 
     Ball()
@@ -37,12 +38,14 @@ public:
     }
 
     bool isValid(float time)
-    {
+    {   
         if (time - startTime <= 500) {
             return true;
         }
         return false;
     }
+
+
 
     void debug()
     {

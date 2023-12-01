@@ -7,5 +7,5 @@
 #include <random>
 
 #define GRAVITY 9.81f
-#define TANK_RADIUS 18.f
-#define TERRAIN_SIZE 100
+#define TANK_RADIUS 6.1f
+#define TERRAIN_SIZE 30

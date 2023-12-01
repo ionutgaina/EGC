@@ -6,7 +6,6 @@ using namespace std;
 class Tank : public MyGameObject
 {
 public:
-    int health = 3;
     float rotation_body = 0;
     float rotation_turret = 0;
     float rotation_cannon = 0;
@@ -17,6 +16,7 @@ public:
         this->radius = TANK_RADIUS;
         this->x = x;
         this->z = z;
+        this->health = 3;
     }
 
     void MoveForward(float speed)
