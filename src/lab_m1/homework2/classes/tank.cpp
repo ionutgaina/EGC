@@ -10,18 +10,24 @@ public:
     float rotation_turret = 0;
     float rotation_cannon = 0;
     float cooldown = 0;
-    
 
     Tank(int x, int z)
     {
-        this->radius = TANK_RADIUS;
         this->x = x;
         this->z = z;
+        this->health = 3;
+        this->radius = TANK_RADIUS;
+    }
+
+    Tank(vector<MyGameObject *> objects)
+    {
+        this->generateXandZ(objects);
+        this->radius = TANK_RADIUS;
         this->health = 3;
     }
 
     bool canShoot(float currentTime)
-    {   
+    {
         if (currentTime - cooldown <= 1)
         {
             return false;
@@ -48,7 +54,7 @@ public:
     }
 
     void rotateCannon(float speed)
-    {   
+    {
         float max_rotation = 0.101f;
         float min_rotation = -0.06f;
 

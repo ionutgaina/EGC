@@ -82,6 +82,20 @@ void Homework2::Init()
 
     projectionMatrix = glm::perspective(RADIANS(fov), window->props.aspectRatio, .01f, 200.f);
 
+
+    // Load enemy tanks
+    {
+        vector<MyGameObject *> collisionObjects;
+        collisionObjects.push_back(friendlyTank);
+
+        for (int i = 0; i < ENEMY_TANKS; i++)
+        {
+            Tank *tank = new Tank(collisionObjects);
+            enemyTanks.push_back(tank);
+            collisionObjects.push_back(tank);
+            cout << "Tank " << i << " at " << tank->x << " " << tank->z << endl;
+        }
+    }
     // Load houses
     {
         vector<MyGameObject *> collisionObjects;
@@ -123,6 +137,11 @@ void Homework2::Update(float deltaTimeSeconds)
 
     { // render tanks
         RenderTank(friendlyTank);
+
+        for (Tank *tank : enemyTanks)
+        {
+            RenderTank(tank);
+        }
     }
 
     { // render bullets
@@ -131,6 +150,7 @@ void Homework2::Update(float deltaTimeSeconds)
             vector<MyGameObject *> collisionObjects;
 
             collisionObjects.push_back(friendlyTank);
+            
             for (int j = 0; j < enemyTanks.size(); j++)
             {
                 collisionObjects.push_back(enemyTanks[j]);
@@ -146,7 +166,7 @@ void Homework2::Update(float deltaTimeSeconds)
             if (hitObject != NULL && hitObject->health > 0)
             {
                 hitObject->health -= 1;
-                cout << "Hit probably tank" << hitObject->health << endl;
+                cout << "Hit tank" << hitObject->health << endl;
             }
 
             if (bullets[i]->isValid(timePassed) && hitObject == NULL)
