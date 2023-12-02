@@ -140,7 +140,7 @@ void Homework2::Update(float deltaTimeSeconds)
 
         for (Tank *tank : enemyTanks)
         {
-            RenderTank(tank);
+            RenderEnemyTank(tank);
         }
     }
 
@@ -150,7 +150,7 @@ void Homework2::Update(float deltaTimeSeconds)
             vector<MyGameObject *> collisionObjects;
 
             collisionObjects.push_back(friendlyTank);
-            
+
             for (int j = 0; j < enemyTanks.size(); j++)
             {
                 collisionObjects.push_back(enemyTanks[j]);
@@ -384,6 +384,27 @@ void Homework2::RenderTank(Tank *tank)
 
     modelMatrix = SpawnModelMatrix(tank_position, tank_rotation);
     RenderMesh(meshes["tank_rails"], shaders["TankShader"], modelMatrix, glm::vec3(0.72f, 0.67f, 0.74f));
+}
+
+void Homework2::RenderEnemyTank(Tank *tank) {
+    glm::vec3 tank_position = glm::vec3(tank->x, tank->y, tank->z);
+    float tank_rotation = tank->rotation_body;
+    float tank_turret_rotation = tank->rotation_turret;
+
+    glm::mat4 modelMatrix = SpawnModelMatrix(tank_position, tank_rotation);
+    RenderMesh(meshes["tank_body"], shaders["TankShader"], modelMatrix, glm::vec3(1, 0, 0));
+
+    modelMatrix = SpawnModelMatrix(tank_position, tank_rotation);
+    modelMatrix = glm::rotate(modelMatrix, tank_turret_rotation, glm::vec3(0, 0, 1));
+    RenderMesh(meshes["tank_turret"], shaders["TankShader"], modelMatrix, glm::vec3(0, 0, 1));
+
+    modelMatrix = SpawnModelMatrix(tank_position, tank_rotation);
+    modelMatrix = glm::rotate(modelMatrix, tank_turret_rotation, glm::vec3(0, 0, 1));
+    modelMatrix = glm::rotate(modelMatrix, tank->rotation_cannon, glm::vec3(1, 0, 0));
+    RenderMesh(meshes["tank_cannon"], shaders["TankShader"], modelMatrix, glm::vec3(0, 1, 0));
+
+    modelMatrix = SpawnModelMatrix(tank_position, tank_rotation);
+    RenderMesh(meshes["tank_rails"], shaders["TankShader"], modelMatrix, glm::vec3(0, 1, 0));
 }
 
 void Homework2::RenderBall(Ball *ball)

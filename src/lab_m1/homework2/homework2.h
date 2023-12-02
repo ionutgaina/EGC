@@ -34,6 +34,7 @@ namespace hw2
       void OnMouseScroll(int mouseX, int mouseY, int offsetX, int offsetY) override;
       void OnWindowResize(int width, int height) override;
       void RenderTank(Tank *tank);
+      void RenderEnemyTank(Tank *tank);
       void RenderBall(Ball *ball);
       glm::mat4 SpawnModelMatrix(glm::vec3 position, float rotation = 0);
 
