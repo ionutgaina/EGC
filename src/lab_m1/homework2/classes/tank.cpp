@@ -9,6 +9,7 @@ public:
     float rotation_body = 0;
     float rotation_turret = 0;
     float rotation_cannon = 0;
+    float cooldown = 0;
     
 
     Tank(int x, int z)
@@ -17,6 +18,17 @@ public:
         this->x = x;
         this->z = z;
         this->health = 3;
+    }
+
+    bool canShoot(float currentTime)
+    {   
+        if (currentTime - cooldown <= 1)
+        {
+            return false;
+        }
+
+        cooldown = currentTime;
+        return true;
     }
 
     void MoveForward(float speed)

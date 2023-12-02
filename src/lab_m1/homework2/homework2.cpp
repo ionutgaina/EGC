@@ -84,7 +84,7 @@ void Homework2::Init()
 
     // Load houses
     {
-        vector<MyGameObject*> collisionObjects;
+        vector<MyGameObject *> collisionObjects;
         collisionObjects.push_back(friendlyTank);
         for (int i = 0; i < enemyTanks.size(); i++)
         {
@@ -113,6 +113,7 @@ void Homework2::FrameStart()
 
 void Homework2::Update(float deltaTimeSeconds)
 {
+    deltaTime = deltaTimeSeconds;
     {
         glm::mat4 modelMatrix = glm::mat4(1);
         modelMatrix = glm::translate(modelMatrix, glm::vec3(0, 0, 0));
@@ -142,7 +143,7 @@ void Homework2::Update(float deltaTimeSeconds)
 
             MyGameObject *hitObject = bullets[i]->getCollisionObject(collisionObjects);
 
-            if (hitObject != NULL)
+            if (hitObject != NULL && hitObject->health > 0)
             {
                 hitObject->health -= 1;
                 cout << "Hit probably tank" << hitObject->health << endl;
@@ -174,9 +175,9 @@ void Homework2::Update(float deltaTimeSeconds)
     }
 
     // // DEBUG PURPOSE
-    // {
-    //     RenderBall(&testBal);
-    // }
+    {
+        RenderBall(&testBal);
+    }
 
     timePassed += deltaTimeSeconds * 100;
 }
@@ -239,34 +240,35 @@ void Homework2::OnInputUpdate(float deltaTime, int mods)
     }
 
     // // DEBUG PURPOSE
-    // if (window->KeyHold(GLFW_KEY_UP))
-    // {
-    //     testBal.z += deltaTime;
-    // }
-    // if (window->KeyHold(GLFW_KEY_DOWN))
-    // {
-    //     testBal.z -= deltaTime;
-    // }
-    // if (window->KeyHold(GLFW_KEY_LEFT))
-    // {
-    //     testBal.x += deltaTime;
-    // }
-    // if (window->KeyHold(GLFW_KEY_RIGHT))
-    // {
-    //     testBal.x -= deltaTime;
-    // }
-    // if (window->KeyHold(GLFW_KEY_KP_ADD))
-    // {
-    //     testBal.y += deltaTime;
-    // }
-    // if (window->KeyHold(GLFW_KEY_KP_SUBTRACT))
-    // {
-    //     testBal.y -= deltaTime;
-    // }
-    // if (window->KeyHold(GLFW_KEY_B))
-    // {
-    //     testBal.debug();
-    // }
+    if (window->KeyHold(GLFW_KEY_UP))
+    {
+        testBal.z += deltaTime;
+    }
+    if (window->KeyHold(GLFW_KEY_DOWN))
+    {
+        testBal.z -= deltaTime;
+    }
+    if (window->KeyHold(GLFW_KEY_LEFT))
+    {
+        testBal.x += deltaTime;
+    }
+    if (window->KeyHold(GLFW_KEY_RIGHT))
+    {
+        testBal.x -= deltaTime;
+    }
+    if (window->KeyHold(GLFW_KEY_KP_ADD))
+    {
+        testBal.y += deltaTime;
+    }
+    if (window->KeyHold(GLFW_KEY_KP_SUBTRACT))
+    {
+        testBal.y -= deltaTime;
+    }
+    if (window->KeyHold(GLFW_KEY_B))
+    {
+        testBal.debug();
+        cout << glfwGetTime() << endl;
+    }
 }
 
 void Homework2::OnKeyPress(int key, int mods)
@@ -286,9 +288,8 @@ void Homework2::OnMouseMove(int mouseX, int mouseY, int deltaX, int deltaY)
     if (window->MouseHold(GLFW_MOUSE_BUTTON_RIGHT))
     {
         float sensivityOY = 0.001f;
-        auxDeltaX = sensivityOY * -deltaX;
-        // float auxDeltaY = sensivityOY * -deltaY;
-        camera->RotateThirdPerson_OY(auxDeltaX);
+
+        camera->RotateThirdPerson_OY(sensivityOY * -deltaX);
         // camera->RotateThirdPerson_OX(auxDeltaY);
     }
     else
@@ -308,9 +309,12 @@ void Homework2::OnMouseBtnPress(int mouseX, int mouseY, int button, int mods)
         float rotation_OX = friendlyTank->rotation_cannon;
         float rotation_OZ = friendlyTank->rotation_turret + friendlyTank->rotation_body;
 
-        Ball* bullet = new Ball(x, z, rotation_OX, rotation_OZ, timePassed);
+        if (friendlyTank->canShoot(glfwGetTime()))
+        {
+            Ball *bullet = new Ball(x, z, rotation_OX, rotation_OZ, timePassed);
 
-        bullets.push_back(bullet);
+            bullets.push_back(bullet);
+        }
     }
 }
 
@@ -362,7 +366,7 @@ void Homework2::RenderTank(Tank *tank)
     RenderMesh(meshes["tank_rails"], shaders["TankShader"], modelMatrix, glm::vec3(0.72f, 0.67f, 0.74f));
 }
 
-void Homework2::RenderBall(Ball* ball)
+void Homework2::RenderBall(Ball *ball)
 {
     glm::vec3 ball_position = glm::vec3(ball->x, ball->y, ball->z);
     float ball_rotation = 0;

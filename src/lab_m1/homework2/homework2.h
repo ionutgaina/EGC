@@ -55,14 +55,17 @@ namespace hw2
       float materialKs;
 
       vector<Ball*> bullets;
+
+      Ball testBal;
       Tank* friendlyTank;
 
       vector<Tank*> enemyTanks;
-
+   
       float timePassed = 0;
 
       int houseCount = rand() % 5 + 10;
       vector<House*> houses;
-      float auxDeltaX = 0;
+      float deltaTime = 0;
+
    };
 } // namespace m1
