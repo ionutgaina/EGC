@@ -6,43 +6,32 @@ using namespace std;
 class House : public MyGameObject
 {
 public:
-    House(vector<MyGameObject> &objects)
+    House(vector<MyGameObject*> objects)
     {
         this->scale = rand() % 30 + 10;
         this->y = 0.5f * scale;
-        this->radius = 0.5f * scale;
+        radius = 0.5f * scale;
 
-        generateXandZ(objects);
+        this->generateXandZ(objects);
     }
 
-    void generateXandZ(vector<MyGameObject> &objects)
+    bool verifyInRadius(float x, float z, float radius) override
     {
-        random_device rd;
-        mt19937 gen(rd());
-        std::uniform_int_distribution<int> distribution(-TERRAIN_SIZE, TERRAIN_SIZE);
+        float distanceX = abs(this->x - x);
+        float distanceZ = abs(this->z - z);
 
-        int ok = 1;
-
-        if (objects.size() == 0)
+        if (distanceX > (this->radius + radius) || distanceZ > (this->radius + radius))
         {
-            this->x = distribution(gen);
-            this->z = distribution(gen);
+            return false;
         }
 
-        while (ok)
+        if (distanceX <= this->radius || distanceZ <= this->radius)
         {
-            this->x = distribution(gen);
-            this->z = distribution(gen);
-
-            for (auto object : objects)
-            {
-                if (object.verifyInSquare(this->x, this->z, this->radius))
-                {
-                    ok = 1;
-                    break;
-                }
-                ok = 0;
-            }
+            return true;
         }
+
+        float cornerDistance = pow(distanceX - this->radius, 2) + pow(distanceZ - this->radius, 2);
+
+        return cornerDistance <= pow(radius, 2);
     }
 };

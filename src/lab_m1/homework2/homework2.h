@@ -54,12 +54,10 @@ namespace hw2
       float materialKd;
       float materialKs;
 
-      vector<Ball> bullets;
+      vector<Ball*> bullets;
       Tank* friendlyTank;
 
       vector<Tank*> enemyTanks;
-
-      Ball testBal;
 
       float timePassed = 0;
 

@@ -12,34 +12,13 @@ public:
     float radius = 0;
     int health = 0;
 
-    bool verifyInRadius(float x, float z, float radius)
-    {
+    virtual bool verifyInRadius(float x, float z, float radius)
+    {   
         float distance = sqrt(pow(this->x - x, 2) + pow(this->z - z, 2));
-        cout << distance << " " << radius <<  " " << this->radius << endl;
         return distance < radius + this->radius;
     }
 
-    bool verifyInSquare(float x, float z, float lengthSquare)
-    {
-        float distanceX = abs(this->x - x);
-        float distanceZ = abs(this->z - z);
-
-        if (distanceX > (lengthSquare + this->radius) || distanceZ > (lengthSquare + this->radius))
-        {
-            return false;
-        }
-
-        if (distanceX <= lengthSquare || distanceZ <= lengthSquare)
-        {
-            return true;
-        }
-
-        float cornerDistance = pow(distanceX - lengthSquare, 2) + pow(distanceZ - lengthSquare, 2);
-
-        return cornerDistance <= pow(this->radius, 2);
-    }
-
-    void generateXandZ(vector<MyGameObject> &objects) {
+    void generateXandZ(vector<MyGameObject*> objects) {
         random_device rd;
         mt19937 gen(rd());
         std::uniform_int_distribution<int> distribution(-TERRAIN_SIZE, TERRAIN_SIZE);
@@ -59,7 +38,7 @@ public:
             
             for (auto object : objects)
             {
-                if (object.verifyInRadius(this->x, this->z, this->radius))
+                if (this->verifyInRadius(object->x, object->z, object->radius))
                 {   
                     ok = 1;
                     break;

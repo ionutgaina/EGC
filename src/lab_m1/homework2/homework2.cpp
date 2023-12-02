@@ -84,11 +84,11 @@ void Homework2::Init()
 
     // Load houses
     {
-        vector<MyGameObject> collisionObjects;
-        collisionObjects.push_back(*friendlyTank);
+        vector<MyGameObject*> collisionObjects;
+        collisionObjects.push_back(friendlyTank);
         for (int i = 0; i < enemyTanks.size(); i++)
         {
-            collisionObjects.push_back(*enemyTanks[i]);
+            collisionObjects.push_back(enemyTanks[i]);
         }
 
         for (int i = 0; i < houseCount; i++)
@@ -140,18 +140,18 @@ void Homework2::Update(float deltaTimeSeconds)
                 collisionObjects.push_back(houses[j]);
             }
 
-            MyGameObject *hitObject = bullets[i].getCollisionObject(collisionObjects);
+            MyGameObject *hitObject = bullets[i]->getCollisionObject(collisionObjects);
 
-            if (hitObject != NULL && hitObject->health > 0)
+            if (hitObject != NULL)
             {
                 hitObject->health -= 1;
                 cout << "Hit probably tank" << hitObject->health << endl;
             }
 
-            if (bullets[i].isValid(timePassed) && hitObject == NULL)
+            if (bullets[i]->isValid(timePassed) && hitObject == NULL)
             {
-                bullets[i].Move(deltaTimeSeconds);
-                RenderBall(&bullets[i]);
+                bullets[i]->Move(deltaTimeSeconds);
+                RenderBall(bullets[i]);
             }
             else
             {
@@ -173,10 +173,10 @@ void Homework2::Update(float deltaTimeSeconds)
         }
     }
 
-    // DEBUG PURPOSE
-    {
-        RenderBall(&testBal);
-    }
+    // // DEBUG PURPOSE
+    // {
+    //     RenderBall(&testBal);
+    // }
 
     timePassed += deltaTimeSeconds * 100;
 }
@@ -238,35 +238,35 @@ void Homework2::OnInputUpdate(float deltaTime, int mods)
         friendlyTank->rotateBody(-deltaTime);
     }
 
-    // DEBUG PURPOSE
-    if (window->KeyHold(GLFW_KEY_UP))
-    {
-        testBal.z += deltaTime;
-    }
-    if (window->KeyHold(GLFW_KEY_DOWN))
-    {
-        testBal.z -= deltaTime;
-    }
-    if (window->KeyHold(GLFW_KEY_LEFT))
-    {
-        testBal.x += deltaTime;
-    }
-    if (window->KeyHold(GLFW_KEY_RIGHT))
-    {
-        testBal.x -= deltaTime;
-    }
-    if (window->KeyHold(GLFW_KEY_KP_ADD))
-    {
-        testBal.y += deltaTime;
-    }
-    if (window->KeyHold(GLFW_KEY_KP_SUBTRACT))
-    {
-        testBal.y -= deltaTime;
-    }
-    if (window->KeyHold(GLFW_KEY_B))
-    {
-        testBal.debug();
-    }
+    // // DEBUG PURPOSE
+    // if (window->KeyHold(GLFW_KEY_UP))
+    // {
+    //     testBal.z += deltaTime;
+    // }
+    // if (window->KeyHold(GLFW_KEY_DOWN))
+    // {
+    //     testBal.z -= deltaTime;
+    // }
+    // if (window->KeyHold(GLFW_KEY_LEFT))
+    // {
+    //     testBal.x += deltaTime;
+    // }
+    // if (window->KeyHold(GLFW_KEY_RIGHT))
+    // {
+    //     testBal.x -= deltaTime;
+    // }
+    // if (window->KeyHold(GLFW_KEY_KP_ADD))
+    // {
+    //     testBal.y += deltaTime;
+    // }
+    // if (window->KeyHold(GLFW_KEY_KP_SUBTRACT))
+    // {
+    //     testBal.y -= deltaTime;
+    // }
+    // if (window->KeyHold(GLFW_KEY_B))
+    // {
+    //     testBal.debug();
+    // }
 }
 
 void Homework2::OnKeyPress(int key, int mods)
@@ -308,7 +308,7 @@ void Homework2::OnMouseBtnPress(int mouseX, int mouseY, int button, int mods)
         float rotation_OX = friendlyTank->rotation_cannon;
         float rotation_OZ = friendlyTank->rotation_turret + friendlyTank->rotation_body;
 
-        Ball bullet = Ball(x, z, rotation_OX, rotation_OZ, timePassed);
+        Ball* bullet = new Ball(x, z, rotation_OX, rotation_OZ, timePassed);
 
         bullets.push_back(bullet);
     }
@@ -362,7 +362,7 @@ void Homework2::RenderTank(Tank *tank)
     RenderMesh(meshes["tank_rails"], shaders["TankShader"], modelMatrix, glm::vec3(0.72f, 0.67f, 0.74f));
 }
 
-void Homework2::RenderBall(Ball *ball)
+void Homework2::RenderBall(Ball* ball)
 {
     glm::vec3 ball_position = glm::vec3(ball->x, ball->y, ball->z);
     float ball_rotation = 0;
