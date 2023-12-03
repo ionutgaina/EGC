@@ -24,6 +24,7 @@ namespace hw2
       void FrameEnd() override;
 
       void RenderMesh(Mesh *mesh, Shader *shader, const glm::mat4 &modelMatrix, const glm::vec3 &color = glm::vec3(1));
+      void RenderMeshTank(Mesh *mesh, Shader *shader, const glm::mat4 &modelMatrix, Tank *tank, const glm::vec3 &color = glm::vec3(1));
 
       void OnInputUpdate(float deltaTime, int mods) override;
       void OnKeyPress(int key, int mods) override;

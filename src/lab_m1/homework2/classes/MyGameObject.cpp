@@ -1,7 +1,6 @@
 #include "../utils.hpp"
 
 using namespace std;
-
 class MyGameObject
 {
 public:
@@ -13,12 +12,13 @@ public:
     int health = 0;
 
     virtual bool verifyInRadius(float x, float z, float radius)
-    {   
+    {
         float distance = sqrt(pow(this->x - x, 2) + pow(this->z - z, 2));
         return distance < radius + this->radius;
     }
 
-    void generateXandZ(vector<MyGameObject*> objects) {
+    void generateXandZ(vector<MyGameObject *> objects)
+    {
         random_device rd;
         mt19937 gen(rd());
         std::uniform_int_distribution<int> distribution(-TERRAIN_SIZE, TERRAIN_SIZE);
@@ -35,11 +35,11 @@ public:
         {
             this->x = distribution(gen);
             this->z = distribution(gen);
-            
+
             for (auto object : objects)
             {
                 if (this->verifyInRadius(object->x, object->z, object->radius))
-                {   
+                {
                     ok = 1;
                     break;
                 }
@@ -48,7 +48,7 @@ public:
         }
     }
 
-    MyGameObject* getCollisionObject(vector<MyGameObject*> objects)
+    MyGameObject *getCollisionObject(vector<MyGameObject *> objects)
     {
         for (auto object : objects)
         {
@@ -60,7 +60,19 @@ public:
         return NULL;
     }
 
-    float calculateAngle(float x1, float y1, float x2, float y2) {
-    return atan2(y2 - y1, x2 - x1) * 180.0f / M_PI;
-}
+    float calculateAngle(float x1, float y1, float x2, float y2)
+    {
+        return atan2(y2 - y1, x2 - x1) / M_PI;
+    }
+
+    bool verifyWorldLimit()
+    {   
+        float WORLD_LIMIT = TERRAIN_SIZE + TERRAIN_SIZE/2;
+        if (this->x > WORLD_LIMIT || this->x < -WORLD_LIMIT || this->z > WORLD_LIMIT || this->z < -WORLD_LIMIT)
+        {
+            return false;
+        }
+
+        return true;
+    }
 };

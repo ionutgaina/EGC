@@ -3,7 +3,6 @@
 
 using namespace std;
 
-
 #define STOP 0
 #define MOVE_FORWARD 1
 #define MOVE_BACKWARD 2
@@ -11,7 +10,6 @@ using namespace std;
 #define ROTATE_RIGHT 4
 #define ROTATE_TURRET_LEFT 5
 #define ROTATE_TURRET_RIGHT 6
-#define WORLD_LIMIT TERRAIN_SIZE+TERRAIN_SIZE/4
 
 class Tank : public MyGameObject
 {
@@ -101,56 +99,62 @@ public:
             this->rotation_cannon += speed;
     }
 
-    void ai(float speed, float currentTime, vector<MyGameObject *> objects, Tank* friendlyTank) {
+    void ai(float speed, float currentTime, vector<MyGameObject *> objects, Tank *friendlyTank)
+    {
 
-        if (currentTime - this->ai_cooldown > this->ai_time) {
+        if (currentTime - this->ai_cooldown > this->ai_time)
+        {
             this->ai_cooldown = currentTime;
             this->ai_state = rand() % 7;
             this->ai_time = rand() % 3 + 1;
         }
 
-        if (this->ai_state == MOVE_FORWARD && !this->MoveForward(speed, objects)) {
+        if (this->ai_state == MOVE_FORWARD && !this->MoveForward(speed, objects))
+        {
             this->ai_state = rand() % 4 + 1;
             ai(speed, currentTime, objects, friendlyTank);
-            return;
         }
+        else
 
-        if (this->ai_state == MOVE_BACKWARD && !this->MoveForward(-speed, objects)) {
+            if (this->ai_state == MOVE_BACKWARD && !this->MoveForward(-speed, objects))
+        {
             this->ai_state = rand() % 4 + 1;
             ai(speed, currentTime, objects, friendlyTank);
-            return;
         }
+        else
 
-        if (this->ai_state == ROTATE_LEFT) {
+            if (this->ai_state == ROTATE_LEFT)
+        {
             this->ai_time -= 0.1f;
-            this->rotateBody(speed/5, objects);
-            return;
+            this->rotateBody(speed / 5, objects);
         }
+        else
 
-        if (this->ai_state == ROTATE_RIGHT ) {
+            if (this->ai_state == ROTATE_RIGHT)
+        {
             this->ai_time -= 0.1f;
             this->rotateBody(-speed / 5, objects);
-            return;
         }
 
-        if (this->ai_state == ROTATE_TURRET_LEFT) {
+        // if (this->verifyInRadius(friendlyTank->x, friendlyTank->z, AI_RADIUS))
+        // {
+        //     float angle = this->calculateAngle(this->x, this->z, friendlyTank->x, friendlyTank->z);
+
+
+        // }
+        // else
+
+            if (this->ai_state == ROTATE_TURRET_LEFT)
+        {
             this->ai_time -= 0.1f;
             this->rotateTurret(speed / 5);
-            return;
         }
+        else
 
-        if (this->ai_state == ROTATE_TURRET_RIGHT) {
+            if (this->ai_state == ROTATE_TURRET_RIGHT)
+        {
             this->ai_time -= 0.1f;
-            this->rotateTurret(-speed/ 5);
-            return;
+            this->rotateTurret(-speed / 5);
         }
-    }
-
-    bool verifyWorldLimit() {
-        if (this->x > WORLD_LIMIT || this->x < -WORLD_LIMIT || this->z > WORLD_LIMIT || this->z < -WORLD_LIMIT) {
-            return false;
-        }
-
-        return true;
     }
 };

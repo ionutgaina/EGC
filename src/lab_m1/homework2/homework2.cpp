@@ -67,8 +67,8 @@ void Homework2::Init()
 
     {
         Shader *shader = new Shader("TankShader");
-        shader->AddShader(PATH_JOIN(window->props.selfDir, SOURCE_PATH::M1, "homework2", "shaders", "VertexShader.glsl"), GL_VERTEX_SHADER);
-        shader->AddShader(PATH_JOIN(window->props.selfDir, SOURCE_PATH::M1, "homework2", "shaders", "FragmentShader.glsl"), GL_FRAGMENT_SHADER);
+        shader->AddShader(PATH_JOIN(window->props.selfDir, SOURCE_PATH::M1, "homework2", "shaders", "VertexTankShader.glsl"), GL_VERTEX_SHADER);
+        shader->AddShader(PATH_JOIN(window->props.selfDir, SOURCE_PATH::M1, "homework2", "shaders", "FragmentTankShader.glsl"), GL_FRAGMENT_SHADER);
         shader->CreateAndLink();
         shaders[shader->GetName()] = shader;
     }
@@ -229,6 +229,30 @@ void Homework2::RenderMesh(Mesh *mesh, Shader *shader, const glm::mat4 &modelMat
     glDrawElements(mesh->GetDrawMode(), static_cast<int>(mesh->indices.size()), GL_UNSIGNED_INT, 0);
 }
 
+void Homework2::RenderMeshTank(Mesh *mesh, Shader *shader, const glm::mat4 &modelMatrix, Tank *tank, const glm::vec3 &color)
+{
+    if (!mesh || !shader || !shader->GetProgramID())
+        return;
+
+    glUseProgram(shader->program);
+
+    glUniform3f(glGetUniformLocation(shader->program, "object_color"), color.x, color.y, color.z);
+    glUniform1i(glGetUniformLocation(shader->program, "health"), tank->health);
+
+    // Bind model matrix
+    GLint loc_model_matrix = glGetUniformLocation(shader->program, "Model");
+    glUniformMatrix4fv(loc_model_matrix, 1, GL_FALSE, glm::value_ptr(modelMatrix));
+    glUniformMatrix4fv(shader->loc_view_matrix, 1, GL_FALSE, glm::value_ptr(camera->GetViewMatrix()));
+
+    // Bind projection matrix
+    glm::mat4 projectionMatrix = GetSceneCamera()->GetProjectionMatrix();
+    int loc_projection_matrix = glGetUniformLocation(shader->program, "Projection");
+    glUniformMatrix4fv(loc_projection_matrix, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+    // Draw the object
+    glBindVertexArray(mesh->GetBuffers()->m_VAO);
+    glDrawElements(mesh->GetDrawMode(), static_cast<int>(mesh->indices.size()), GL_UNSIGNED_INT, 0);
+}
+
 void Homework2::OnInputUpdate(float deltaTime, int mods)
 {
     vector<MyGameObject *> collisionObjects;
@@ -381,19 +405,19 @@ void Homework2::RenderTank(Tank *tank)
     float tank_turret_rotation = tank->rotation_turret;
 
     glm::mat4 modelMatrix = SpawnModelMatrix(tank_position, tank_rotation);
-    RenderMesh(meshes["tank_body"], shaders["TankShader"], modelMatrix, glm::vec3(0.27f, 0.71f, 0.28f));
+    RenderMeshTank(meshes["tank_body"], shaders["TankShader"], modelMatrix, tank, glm::vec3(0.27f, 0.71f, 0.28f));
 
     modelMatrix = SpawnModelMatrix(tank_position, tank_rotation);
     modelMatrix = glm::rotate(modelMatrix, tank_turret_rotation, glm::vec3(0, 0, 1));
-    RenderMesh(meshes["tank_turret"], shaders["TankShader"], modelMatrix, glm::vec3(0.07f, 0.41f, 0.21f));
+    RenderMeshTank(meshes["tank_turret"], shaders["TankShader"], modelMatrix, tank, glm::vec3(0.07f, 0.41f, 0.21f));
 
     modelMatrix = SpawnModelMatrix(tank_position, tank_rotation);
     modelMatrix = glm::rotate(modelMatrix, tank_turret_rotation, glm::vec3(0, 0, 1));
     modelMatrix = glm::rotate(modelMatrix, tank->rotation_cannon, glm::vec3(1, 0, 0));
-    RenderMesh(meshes["tank_cannon"], shaders["TankShader"], modelMatrix, glm::vec3(0.72f, 0.67f, 0.74f));
+    RenderMeshTank(meshes["tank_cannon"], shaders["TankShader"], modelMatrix, tank, glm::vec3(0.72f, 0.67f, 0.74f));
 
     modelMatrix = SpawnModelMatrix(tank_position, tank_rotation);
-    RenderMesh(meshes["tank_rails"], shaders["TankShader"], modelMatrix, glm::vec3(0.72f, 0.67f, 0.74f));
+    RenderMeshTank(meshes["tank_rails"], shaders["TankShader"], modelMatrix, tank, glm::vec3(0.72f, 0.67f, 0.74f));
 }
 
 void Homework2::RenderEnemyTank(Tank *tank)
@@ -415,26 +439,27 @@ void Homework2::RenderEnemyTank(Tank *tank)
         collisionObjects.push_back(houses[i]);
     }
 
-    tank->ai(deltaTime * cameraSpeed, glfwGetTime(), collisionObjects, friendlyTank);
+    if (tank->health > 0)
+        tank->ai(deltaTime * cameraSpeed, glfwGetTime(), collisionObjects, friendlyTank);
 
     glm::vec3 tank_position = glm::vec3(tank->x, tank->y, tank->z);
     float tank_rotation = tank->rotation_body;
     float tank_turret_rotation = tank->rotation_turret;
 
     glm::mat4 modelMatrix = SpawnModelMatrix(tank_position, tank_rotation);
-    RenderMesh(meshes["tank_body"], shaders["TankShader"], modelMatrix, glm::vec3(1, 0, 0));
+    RenderMeshTank(meshes["tank_body"], shaders["TankShader"], modelMatrix, tank, glm::vec3(1, 0, 0));
 
     modelMatrix = SpawnModelMatrix(tank_position, tank_rotation);
     modelMatrix = glm::rotate(modelMatrix, tank_turret_rotation, glm::vec3(0, 0, 1));
-    RenderMesh(meshes["tank_turret"], shaders["TankShader"], modelMatrix, glm::vec3(0, 0, 1));
+    RenderMeshTank(meshes["tank_turret"], shaders["TankShader"], modelMatrix, tank, glm::vec3(0, 0, 1));
 
     modelMatrix = SpawnModelMatrix(tank_position, tank_rotation);
     modelMatrix = glm::rotate(modelMatrix, tank_turret_rotation, glm::vec3(0, 0, 1));
     modelMatrix = glm::rotate(modelMatrix, tank->rotation_cannon, glm::vec3(1, 0, 0));
-    RenderMesh(meshes["tank_cannon"], shaders["TankShader"], modelMatrix, glm::vec3(0, 1, 0));
+    RenderMeshTank(meshes["tank_cannon"], shaders["TankShader"], modelMatrix, tank, glm::vec3(0, 1, 0));
 
     modelMatrix = SpawnModelMatrix(tank_position, tank_rotation);
-    RenderMesh(meshes["tank_rails"], shaders["TankShader"], modelMatrix, glm::vec3(0, 1, 0));
+    RenderMeshTank(meshes["tank_rails"], shaders["TankShader"], modelMatrix, tank, glm::vec3(0, 1, 0));
 }
 
 void Homework2::RenderBall(Ball *ball)
