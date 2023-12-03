@@ -82,7 +82,6 @@ void Homework2::Init()
 
     projectionMatrix = glm::perspective(RADIANS(fov), window->props.aspectRatio, .01f, 200.f);
 
-
     // Load enemy tanks
     {
         vector<MyGameObject *> collisionObjects;
@@ -232,31 +231,42 @@ void Homework2::RenderMesh(Mesh *mesh, Shader *shader, const glm::mat4 &modelMat
 
 void Homework2::OnInputUpdate(float deltaTime, int mods)
 {
+    vector<MyGameObject *> collisionObjects;
+
+    for (int i = 0; i < ENEMY_TANKS; i++)
+    {
+        collisionObjects.push_back(enemyTanks[i]);
+    }
+
+    for (int i = 0; i < houseCount; i++)
+    {
+        collisionObjects.push_back(houses[i]);
+    }
 
     if (window->KeyHold(GLFW_KEY_W))
     {
         // Translate the camera forward
-        camera->MoveForward(deltaTime * cameraSpeed, friendlyTank->rotation_body);
-        friendlyTank->MoveForward(deltaTime * cameraSpeed);
+        if (friendlyTank->MoveForward(deltaTime * cameraSpeed, collisionObjects))
+            camera->MoveForward(deltaTime * cameraSpeed, friendlyTank->rotation_body);
     }
     else if (window->KeyHold(GLFW_KEY_S))
     {
         // Translate the camera backwards
-        camera->MoveForward(-deltaTime * cameraSpeed, friendlyTank->rotation_body);
-        friendlyTank->MoveForward(-deltaTime * cameraSpeed);
+        if (friendlyTank->MoveForward(-deltaTime * cameraSpeed, collisionObjects))
+            camera->MoveForward(-deltaTime * cameraSpeed, friendlyTank->rotation_body);
     }
 
     if (window->KeyHold(GLFW_KEY_A))
     {
         // Translate the camera to the left
-        camera->RotateThirdPerson_OY(deltaTime);
-        friendlyTank->rotateBody(deltaTime);
+        if (friendlyTank->rotateBody(deltaTime, collisionObjects))
+            camera->RotateThirdPerson_OY(deltaTime);
     }
     else if (window->KeyHold(GLFW_KEY_D))
     {
         // Translate the camera to the right
-        camera->RotateThirdPerson_OY(-deltaTime);
-        friendlyTank->rotateBody(-deltaTime);
+        if (friendlyTank->rotateBody(-deltaTime, collisionObjects))
+            camera->RotateThirdPerson_OY(-deltaTime);
     }
 
     // // DEBUG PURPOSE
@@ -386,7 +396,27 @@ void Homework2::RenderTank(Tank *tank)
     RenderMesh(meshes["tank_rails"], shaders["TankShader"], modelMatrix, glm::vec3(0.72f, 0.67f, 0.74f));
 }
 
-void Homework2::RenderEnemyTank(Tank *tank) {
+void Homework2::RenderEnemyTank(Tank *tank)
+{
+    vector<MyGameObject *> collisionObjects;
+
+    collisionObjects.push_back(friendlyTank);
+
+    for (int i = 0; i < enemyTanks.size(); i++)
+    {
+        if (enemyTanks[i] != tank)
+        {
+            collisionObjects.push_back(enemyTanks[i]);
+        }
+    }
+
+    for (int i = 0; i < houseCount; i++)
+    {
+        collisionObjects.push_back(houses[i]);
+    }
+
+    tank->ai(deltaTime * cameraSpeed, glfwGetTime(), collisionObjects, friendlyTank);
+
     glm::vec3 tank_position = glm::vec3(tank->x, tank->y, tank->z);
     float tank_rotation = tank->rotation_body;
     float tank_turret_rotation = tank->rotation_turret;
