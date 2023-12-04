@@ -19,8 +19,10 @@ out vec3 color;
 
 void main()
 {   
+    int health_rate = 3 -health;
+    color = object_color - vec3(0.2, 0.2, 0.2) * health_rate;
+    
+    vec3 position = vec3(v_position.x - sin(health_rate) * 2, v_position.y + sin(health_rate) * 4, v_position.z);
 
-    color = object_color - vec3(0.3, 0.3, 0.3) * (3 - health);
-
-    gl_Position = Projection * View * Model * vec4(v_position, 1.0);
+    gl_Position = Projection * View * Model * vec4(position, 1.0);
 }

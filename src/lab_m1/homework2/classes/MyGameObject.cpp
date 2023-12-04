@@ -62,7 +62,7 @@ public:
 
     float calculateAngle(float x1, float y1, float x2, float y2)
     {
-        return atan2(y2 - y1, x2 - x1) / M_PI;
+        return atan2(y2 - y1, x2 - x1) / M_PI * 180;
     }
 
     bool verifyWorldLimit()

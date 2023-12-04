@@ -105,7 +105,7 @@ public:
         if (currentTime - this->ai_cooldown > this->ai_time)
         {
             this->ai_cooldown = currentTime;
-            this->ai_state = rand() % 7;
+            // this->ai_state = rand() % 7;
             this->ai_time = rand() % 3 + 1;
         }
 
@@ -136,25 +136,25 @@ public:
             this->rotateBody(-speed / 5, objects);
         }
 
-        // if (this->verifyInRadius(friendlyTank->x, friendlyTank->z, AI_RADIUS))
+        if (this->verifyInRadius(friendlyTank->x, friendlyTank->z, AI_RADIUS))
+        {
+            float angle = this->calculateAngle(friendlyTank->x, friendlyTank->z, this->x, this->z);
+            this->rotation_turret = -(angle * 0.0174532925194444f + 3.14159265358979323846f / 2);
+            // cout << rotation_turret << endl;
+        }
+        // else
+
+        // if (this->ai_state == ROTATE_TURRET_LEFT)
         // {
-        //     float angle = this->calculateAngle(this->x, this->z, friendlyTank->x, friendlyTank->z);
-
-
+        //     this->ai_time -= 0.1f;
+        //     this->rotateTurret(speed / 5);
         // }
         // else
 
-            if (this->ai_state == ROTATE_TURRET_LEFT)
-        {
-            this->ai_time -= 0.1f;
-            this->rotateTurret(speed / 5);
-        }
-        else
-
-            if (this->ai_state == ROTATE_TURRET_RIGHT)
-        {
-            this->ai_time -= 0.1f;
-            this->rotateTurret(-speed / 5);
-        }
+        //     if (this->ai_state == ROTATE_TURRET_RIGHT)
+        // {
+        //     this->ai_time -= 0.1f;
+        //     this->rotateTurret(-speed / 5);
+        // }
     }
 };
