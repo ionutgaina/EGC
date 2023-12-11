@@ -1,6 +1,7 @@
 #pragma once
 
 #include "components/simple_scene.h"
+#include "components/transform.h"
 #include "lab_m1/homework2/camera.h"
 #include "lab_m1/homework2/classes/house.cpp"
 #include "lab_m1/homework2/classes/tank.cpp"
@@ -58,16 +59,16 @@ namespace hw2
 
       vector<Ball*> bullets;
 
-      Ball testBal;
       Tank* friendlyTank;
 
       vector<Tank*> enemyTanks;
    
-      float timePassed = 0;
+      float startTime = glfwGetTime();
 
       int houseCount = rand() % 5 + 10;
       vector<House*> houses;
       float deltaTime = 0;
-
+      int score = 0;
+      bool gameOver = false;
    };
 } // namespace m1

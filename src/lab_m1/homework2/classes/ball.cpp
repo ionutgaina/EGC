@@ -39,7 +39,7 @@ public:
 
     bool isValid(float time)
     {   
-        if (time - startTime <= 500) {
+        if (time - startTime <= 5) {
             return true;
         }
         return false;

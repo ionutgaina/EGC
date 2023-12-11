@@ -26,20 +26,20 @@ public:
     {
         this->x = x;
         this->z = z;
-        this->health = 3;
+        this->health = HEALTH;
         this->radius = TANK_RADIUS;
     }
 
     Tank(vector<MyGameObject *> objects)
     {
-        this->generateXandZ(objects);
         this->radius = TANK_RADIUS;
-        this->health = 3;
+        this->health = HEALTH;
+        this->generateXandZ(objects);
     }
 
     bool canShoot(float currentTime)
     {
-        if (currentTime - cooldown <= 1)
+        if (currentTime - cooldown <= SHOOT_COOLDOWN / 100)
         {
             return false;
         }
@@ -104,8 +104,13 @@ public:
 
         if (currentTime - this->ai_cooldown > this->ai_time)
         {
+            srand(x + z + (int)currentTime + (int)friendlyTank->x + (int)friendlyTank->z + (int)friendlyTank->rotation_body + (int)friendlyTank->rotation_turret + (int)friendlyTank->rotation_cannon);
             this->ai_cooldown = currentTime;
-            // this->ai_state = rand() % 7;
+            if (currentTime >= TIMEOVER)
+                this->ai_time = rand() % 4 + 3;
+            else 
+                this->ai_state = rand() % 7;
+
             this->ai_time = rand() % 3 + 1;
         }
 
@@ -139,22 +144,29 @@ public:
         if (this->verifyInRadius(friendlyTank->x, friendlyTank->z, AI_RADIUS))
         {
             float angle = this->calculateAngle(friendlyTank->x, friendlyTank->z, this->x, this->z);
-            this->rotation_turret = -(angle * 0.0174532925194444f + 3.14159265358979323846f / 2);
-            // cout << rotation_turret << endl;
+            float target_angle = -(angle * 0.0174532925194444f + 3.14159265358979323846f / 2) - this->rotation_body;
+            if (target_angle > this->rotation_turret)
+            {
+                this->rotateTurret(speed / 5);
+            }
+            else if (target_angle < this->rotation_turret)
+            {
+                this->rotateTurret(-speed / 5);
+            }
         }
-        // else
+        else
 
-        // if (this->ai_state == ROTATE_TURRET_LEFT)
-        // {
-        //     this->ai_time -= 0.1f;
-        //     this->rotateTurret(speed / 5);
-        // }
-        // else
+        if (this->ai_state == ROTATE_TURRET_LEFT)
+        {
+            this->ai_time -= 0.1f;
+            this->rotateTurret(speed / 5);
+        }
+        else
 
-        //     if (this->ai_state == ROTATE_TURRET_RIGHT)
-        // {
-        //     this->ai_time -= 0.1f;
-        //     this->rotateTurret(-speed / 5);
-        // }
+            if (this->ai_state == ROTATE_TURRET_RIGHT)
+        {
+            this->ai_time -= 0.1f;
+            this->rotateTurret(-speed / 5);
+        }
     }
 };

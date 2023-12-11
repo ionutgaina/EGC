@@ -92,7 +92,6 @@ void Homework2::Init()
             Tank *tank = new Tank(collisionObjects);
             enemyTanks.push_back(tank);
             collisionObjects.push_back(tank);
-            cout << "Tank " << i << " at " << tank->x << " " << tank->z << endl;
         }
     }
     // Load houses
@@ -108,7 +107,6 @@ void Homework2::Init()
         {
             House *house = new House(collisionObjects);
             houses.push_back(house);
-            cout << "House " << i << " at " << house->x << " " << house->z << endl;
         }
     }
 }
@@ -165,10 +163,13 @@ void Homework2::Update(float deltaTimeSeconds)
             if (hitObject != NULL && hitObject->health > 0)
             {
                 hitObject->health -= 1;
-                cout << "Hit tank" << hitObject->health << endl;
+                if (hitObject->health == 0 && hitObject != friendlyTank)
+                {
+                    score += 1;
+                }
             }
 
-            if (bullets[i]->isValid(timePassed) && hitObject == NULL)
+            if (bullets[i]->isValid(glfwGetTime()) && hitObject == NULL)
             {
                 bullets[i]->Move(deltaTimeSeconds);
                 RenderBall(bullets[i]);
@@ -193,12 +194,19 @@ void Homework2::Update(float deltaTimeSeconds)
         }
     }
 
-    // // DEBUG PURPOSE
+    if (friendlyTank->health <= 0 && gameOver == false)
     {
-        RenderBall(&testBal);
+        cout << "GAME OVER" << endl;
+        cout << "You tank is destroyed, you lost!" << endl;
+        gameOver = true;
     }
 
-    timePassed += deltaTimeSeconds * 100;
+    if (glfwGetTime() - startTime >= TIMEOVER && gameOver == false)
+    {
+        cout << "GAME OVER" << endl;
+        cout << "You survived " << TIMEOVER << " seconds and destroyed " << score << " enemy tanks!" << endl;
+        gameOver = true;
+    }
 }
 
 void Homework2::FrameEnd()
@@ -213,6 +221,9 @@ void Homework2::RenderMesh(Mesh *mesh, Shader *shader, const glm::mat4 &modelMat
     glUseProgram(shader->program);
 
     glUniform3f(glGetUniformLocation(shader->program, "object_color"), color.x, color.y, color.z);
+
+    glm::vec3 eyePosition = GetSceneCamera()->m_transform->GetWorldPosition();
+    glUniform3f(glGetUniformLocation(shader->program, "eye_position"), eyePosition.x, eyePosition.y, eyePosition.z);
 
     // Bind model matrix
     GLint loc_model_matrix = glGetUniformLocation(shader->program, "Model");
@@ -238,6 +249,9 @@ void Homework2::RenderMeshTank(Mesh *mesh, Shader *shader, const glm::mat4 &mode
 
     glUniform3f(glGetUniformLocation(shader->program, "object_color"), color.x, color.y, color.z);
     glUniform1i(glGetUniformLocation(shader->program, "health"), tank->health);
+    glUniform1i(glGetUniformLocation(shader->program, "HEALTH_CONSTANT"), HEALTH);
+    glm::vec3 eyePosition = GetSceneCamera()->m_transform->GetWorldPosition();
+    glUniform3f(glGetUniformLocation(shader->program, "eye_position"), eyePosition.x, eyePosition.y, eyePosition.z);
 
     // Bind model matrix
     GLint loc_model_matrix = glGetUniformLocation(shader->program, "Model");
@@ -255,6 +269,11 @@ void Homework2::RenderMeshTank(Mesh *mesh, Shader *shader, const glm::mat4 &mode
 
 void Homework2::OnInputUpdate(float deltaTime, int mods)
 {
+    if (gameOver == true)
+    {
+        return;
+    }
+
     vector<MyGameObject *> collisionObjects;
 
     for (int i = 0; i < ENEMY_TANKS; i++)
@@ -291,37 +310,6 @@ void Homework2::OnInputUpdate(float deltaTime, int mods)
         // Translate the camera to the right
         if (friendlyTank->rotateBody(-deltaTime, collisionObjects))
             camera->RotateThirdPerson_OY(-deltaTime);
-    }
-
-    // // DEBUG PURPOSE
-    if (window->KeyHold(GLFW_KEY_UP))
-    {
-        testBal.z += deltaTime;
-    }
-    if (window->KeyHold(GLFW_KEY_DOWN))
-    {
-        testBal.z -= deltaTime;
-    }
-    if (window->KeyHold(GLFW_KEY_LEFT))
-    {
-        testBal.x += deltaTime;
-    }
-    if (window->KeyHold(GLFW_KEY_RIGHT))
-    {
-        testBal.x -= deltaTime;
-    }
-    if (window->KeyHold(GLFW_KEY_KP_ADD))
-    {
-        testBal.y += deltaTime;
-    }
-    if (window->KeyHold(GLFW_KEY_KP_SUBTRACT))
-    {
-        testBal.y -= deltaTime;
-    }
-    if (window->KeyHold(GLFW_KEY_B))
-    {
-        testBal.debug();
-        cout << glfwGetTime() << endl;
     }
 }
 
@@ -365,7 +353,7 @@ void Homework2::OnMouseBtnPress(int mouseX, int mouseY, int button, int mods)
 
         if (friendlyTank->canShoot(glfwGetTime()))
         {
-            Ball *bullet = new Ball(x, z, rotation_OX, rotation_OZ, timePassed);
+            Ball *bullet = new Ball(x, z, rotation_OX, rotation_OZ, glfwGetTime());
 
             bullets.push_back(bullet);
         }
@@ -439,8 +427,18 @@ void Homework2::RenderEnemyTank(Tank *tank)
         collisionObjects.push_back(houses[i]);
     }
 
-    if (tank->health > 0)
+    if (tank->health > 0 && gameOver == false) {
         tank->ai(deltaTime * cameraSpeed, glfwGetTime(), collisionObjects, friendlyTank);
+        if (tank->verifyInRadius(friendlyTank->x, friendlyTank->z, AI_RADIUS) && tank->canShoot(glfwGetTime()))
+        {
+            float x = tank->x;
+            float z = tank->z;
+            float rotation_OX = tank->rotation_cannon;
+            float rotation_OZ = tank->rotation_turret + tank->rotation_body;
+            Ball *bullet = new Ball(x, z, rotation_OX, rotation_OZ, glfwGetTime());
+            bullets.push_back(bullet);
+        }
+    }
 
     glm::vec3 tank_position = glm::vec3(tank->x, tank->y, tank->z);
     float tank_rotation = tank->rotation_body;
@@ -450,6 +448,13 @@ void Homework2::RenderEnemyTank(Tank *tank)
     RenderMeshTank(meshes["tank_body"], shaders["TankShader"], modelMatrix, tank, glm::vec3(1, 0, 0));
 
     modelMatrix = SpawnModelMatrix(tank_position, tank_rotation);
+    RenderMeshTank(meshes["tank_rails"], shaders["TankShader"], modelMatrix, tank, glm::vec3(0, 1, 0));
+
+    if (tank->health <= 0)
+    {
+        return;
+    }
+    modelMatrix = SpawnModelMatrix(tank_position, tank_rotation);
     modelMatrix = glm::rotate(modelMatrix, tank_turret_rotation, glm::vec3(0, 0, 1));
     RenderMeshTank(meshes["tank_turret"], shaders["TankShader"], modelMatrix, tank, glm::vec3(0, 0, 1));
 
@@ -457,9 +462,6 @@ void Homework2::RenderEnemyTank(Tank *tank)
     modelMatrix = glm::rotate(modelMatrix, tank_turret_rotation, glm::vec3(0, 0, 1));
     modelMatrix = glm::rotate(modelMatrix, tank->rotation_cannon, glm::vec3(1, 0, 0));
     RenderMeshTank(meshes["tank_cannon"], shaders["TankShader"], modelMatrix, tank, glm::vec3(0, 1, 0));
-
-    modelMatrix = SpawnModelMatrix(tank_position, tank_rotation);
-    RenderMeshTank(meshes["tank_rails"], shaders["TankShader"], modelMatrix, tank, glm::vec3(0, 1, 0));
 }
 
 void Homework2::RenderBall(Ball *ball)
